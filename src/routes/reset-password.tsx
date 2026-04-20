@@ -26,7 +26,7 @@ function ResetPage() {
     setSubmitting(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Password updated! Please sign in.");
-    navigate({ to: "/signin" });
+    navigate({ to: "/signin", search: { redirect: "/dashboard" } });
   };
 
   return (

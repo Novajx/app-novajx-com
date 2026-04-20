@@ -25,10 +25,10 @@ function Landing() {
         </div>
         <div className="flex items-center gap-2">
           <Button asChild variant="ghost" size="sm">
-            <Link to="/signin">Sign in</Link>
+            <Link to="/signin" search={{ redirect: "/dashboard" }}>Sign in</Link>
           </Button>
           <Button asChild size="sm" className="bg-gradient-primary text-primary-foreground shadow-elegant">
-            <Link to="/signup">Get started</Link>
+            <Link to="/signup" search={{ ref: "" }}>Get started</Link>
           </Button>
         </div>
       </header>
@@ -52,7 +52,7 @@ function Landing() {
 
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button asChild size="lg" className="bg-gradient-primary text-primary-foreground shadow-elegant gap-2 h-12 px-8">
-              <Link to="/signup">Start mining free <ArrowRight className="h-4 w-4" /></Link>
+              <Link to="/signup" search={{ ref: "" }}>Start mining free <ArrowRight className="h-4 w-4" /></Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="h-12 px-8">
               <Link to="/leaderboard">View leaderboard</Link>
@@ -103,7 +103,7 @@ function Landing() {
         <h2 className="mt-4 text-3xl font-bold tracking-tight">Mine. Invite. Climb the leaderboard.</h2>
         <p className="mt-3 text-muted-foreground">The earliest miners earn the most. Join now and lock in your rank.</p>
         <Button asChild size="lg" className="mt-6 bg-gradient-primary text-primary-foreground shadow-elegant h-12 px-8">
-          <Link to="/signup">Create free account</Link>
+          <Link to="/signup" search={{ ref: "" }}>Create free account</Link>
         </Button>
       </section>
 

@@ -48,7 +48,7 @@ function ForgotPage() {
             </Button>
           </form>
           <p className="mt-5 text-center text-sm">
-            <Link to="/signin" className="text-primary hover:underline">Back to sign in</Link>
+            <Link to="/signin" search={{ redirect: "/dashboard" }} className="text-primary hover:underline">Back to sign in</Link>
           </p>
         </div>
       </div>

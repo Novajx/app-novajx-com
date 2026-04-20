@@ -71,7 +71,7 @@ function SignInPage() {
           </form>
           <div className="mt-5 flex items-center justify-between text-sm">
             <Link to="/forgot-password" className="text-muted-foreground hover:text-foreground">Forgot password?</Link>
-            <Link to="/signup" className="font-medium text-primary hover:underline">Create account</Link>
+            <Link to="/signup" search={{ ref: "" }} className="font-medium text-primary hover:underline">Create account</Link>
           </div>
         </div>
       </div>
