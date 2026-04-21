@@ -18,16 +18,28 @@ const schema = z.object({
 });
 type FormData = z.infer<typeof schema>;
 
+// Only allow same-origin relative paths to prevent open-redirect attacks
+function safeRedirect(target: string | undefined, fallback = "/dashboard"): string {
+  if (!target || typeof target !== "string") return fallback;
+  // Must start with a single "/" and not "//" or "/\" (protocol-relative)
+  if (!target.startsWith("/")) return fallback;
+  if (target.startsWith("//") || target.startsWith("/\\")) return fallback;
+  // Block anything that looks like a URL scheme
+  if (/^\/?[a-z]+:/i.test(target)) return fallback;
+  return target;
+}
+
 export const Route = createFileRoute("/signin")({
   validateSearch: (s: Record<string, unknown>) => ({
-    redirect: typeof s.redirect === "string" ? s.redirect : "/dashboard",
+    redirect: safeRedirect(typeof s.redirect === "string" ? s.redirect : undefined),
   }),
   component: SignInPage,
   head: () => ({ meta: [{ title: "Sign in — NovaJX" }] }),
 });
 
 function SignInPage() {
-  const { redirect } = Route.useSearch();
+  const { redirect: rawRedirect } = Route.useSearch();
+  const redirect = safeRedirect(rawRedirect);
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [submitting, setSubmitting] = useState(false);
