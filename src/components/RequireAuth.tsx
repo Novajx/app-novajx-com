@@ -9,13 +9,13 @@ export function RequireAuth({ children, requireAdmin = false }: { children: Reac
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate({ to: "/signin", search: { redirect: window.location.pathname } });
+      navigate({ to: "/signin" as any, search: { redirect: window.location.pathname } as any });
     }
   }, [user, loading, navigate]);
 
   useEffect(() => {
     if (!loading && user && requireAdmin && !isAdmin) {
-      navigate({ to: "/dashboard" });
+      navigate({ to: "/dashboard" as any });
     }
   }, [user, isAdmin, requireAdmin, loading, navigate]);
 
