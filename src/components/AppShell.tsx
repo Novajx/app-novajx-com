@@ -20,14 +20,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-gradient-hero pb-24">
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <Link to="/dashboard" className="flex items-center gap-2">
+          <Link to={"/dashboard" as any} className="flex items-center gap-2">
             <img src={logo} alt="NovaJX" width={32} height={32} className="h-8 w-8" />
             <span className="font-display text-lg font-bold tracking-tight">NovaJX</span>
           </Link>
           <div className="flex items-center gap-2">
             {isAdmin && (
               <Button asChild variant="outline" size="sm" className="gap-1.5">
-                <Link to="/admin">
+                <Link to={"/admin" as any}>
                   <ShieldCheck className="h-4 w-4" />
                   <span className="hidden sm:inline">Admin</span>
                 </Link>
@@ -47,7 +47,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             return (
               <Link
                 key={item.to}
-                to={item.to}
+                to={item.to as any}
                 className={`flex flex-1 flex-col items-center gap-0.5 rounded-lg px-2 py-2 text-xs font-medium transition-smooth ${
                   active
                     ? "text-primary"
