@@ -4,11 +4,20 @@ import { routeTree } from "./routeTree.gen";
 
 function DefaultErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
+  // Avoid leaking raw backend/database error text to end users in production.
+  const isDev = import.meta.env.DEV;
+  const userMessage = isDev
+    ? error.message || "An unexpected error occurred."
+    : "An unexpected error occurred. Please try again.";
+  if (!isDev && error) {
+    // Keep the real error available for debugging, but only in the console.
+    console.error("[App error]", error);
+  }
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">Something went wrong</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{error.message || "An unexpected error occurred."}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{userMessage}</p>
         <div className="mt-6 flex items-center justify-center gap-3">
           <button
             onClick={() => { router.invalidate(); reset(); }}
