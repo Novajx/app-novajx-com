@@ -44,7 +44,18 @@ function Landing() {
           </div>
 
           <h1 className="mx-auto mt-6 max-w-3xl text-5xl font-bold tracking-tight md:text-7xl">
-            The future of <span className="bg-gradient-primary bg-clip-text text-transparent">mobile mining</span>
+            The future of{" "}
+            <span
+              className="text-transparent"
+              style={{
+                backgroundImage: "var(--gradient-primary)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              mobile mining
+            </span>
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-lg text-muted-foreground">
             NovaJX (NJX) lets anyone mine crypto from their phone — no hardware, no electricity, no fees. Just one tap a day.
