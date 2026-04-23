@@ -1,8 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
 import { Pickaxe, Users, Trophy, ShieldCheck, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/novajx-logo.png";
+import logo from "@/assets/novajx-mark.png";
 import { CoinIcon } from "@/components/CoinIcon";
 
 export const Route = createFileRoute("/")({
@@ -18,12 +17,12 @@ export const Route = createFileRoute("/")({
 function Landing() {
   return (
     <div className="min-h-screen bg-gradient-hero">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5">
-        <div className="flex items-center gap-2">
-          <img src={logo} alt="NovaJX logo" width={36} height={36} className="h-9 w-9" />
-          <span className="font-display text-xl font-bold tracking-tight">NovaJX</span>
-        </div>
-        <div className="flex items-center gap-2">
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
+        <Link to="/" className="flex items-center gap-2.5">
+          <img src={logo} alt="NovaJX" width={36} height={36} className="h-9 w-9 rounded-lg" />
+          <span className="font-display text-lg font-bold tracking-tight sm:text-xl">NovaJX</span>
+        </Link>
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <Button asChild variant="ghost" size="sm">
             <Link to="/signin" search={{ redirect: "/dashboard" }}>Sign in</Link>
           </Button>
@@ -33,87 +32,68 @@ function Landing() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-6xl px-4 pt-12 pb-20 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary">
-            <Sparkles className="h-3.5 w-3.5" /> Now mining — claim 2 NJX every 24 hours
-          </div>
+      <section className="mx-auto max-w-5xl px-4 pt-10 pb-16 text-center sm:px-6 sm:pt-16 sm:pb-20">
+        <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-medium text-primary backdrop-blur-sm">
+          <Sparkles className="h-3.5 w-3.5" /> Claim 2 NJX every 24 hours
+        </div>
 
-          <h1 className="mx-auto mt-6 max-w-3xl text-5xl font-bold tracking-tight md:text-7xl">
-            The future of{" "}
-            <span
-              className="text-transparent"
-              style={{
-                backgroundImage: "var(--gradient-primary)",
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              mobile mining
-            </span>
-          </h1>
-          <p className="mx-auto mt-5 max-w-xl text-lg text-muted-foreground">
-            NovaJX (NJX) lets anyone mine crypto from their phone — no hardware, no electricity, no fees. Just one tap a day.
-          </p>
+        <h1 className="mx-auto mt-7 max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
+          Mine the future,{" "}
+          <span
+            className="bg-gradient-gold bg-clip-text"
+            style={{ WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}
+          >
+            from your phone
+          </span>
+        </h1>
 
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button asChild size="lg" className="bg-gradient-primary text-primary-foreground shadow-elegant gap-2 h-12 px-8">
-              <Link to="/signup" search={{ ref: "" }}>Start mining free <ArrowRight className="h-4 w-4" /></Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="h-12 px-8">
-              <Link to="/leaderboard">View leaderboard</Link>
-            </Button>
-          </div>
-        </motion.div>
+        <p className="mx-auto mt-6 max-w-xl text-base text-muted-foreground sm:text-lg">
+          NovaJX (NJX) is the next-gen mobile crypto. No hardware, no electricity, no fees — just one tap a day.
+        </p>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="mt-16 flex justify-center"
-        >
+        <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Button asChild size="lg" className="h-12 w-full gap-2 bg-gradient-primary px-8 text-primary-foreground shadow-elegant sm:w-auto">
+            <Link to="/signup" search={{ ref: "" }}>Start mining free <ArrowRight className="h-4 w-4" /></Link>
+          </Button>
+          <Button asChild size="lg" variant="ghost" className="h-12 w-full px-8 text-foreground hover:bg-primary/10 sm:w-auto">
+            <Link to="/leaderboard">View leaderboard</Link>
+          </Button>
+        </div>
+
+        <div className="mt-16 flex justify-center sm:mt-20">
           <div className="relative">
             <div className="absolute inset-0 animate-coin-pulse rounded-full" />
-            <CoinIcon size={140} className="text-4xl shadow-glow" />
+            <CoinIcon size={160} className="shadow-glow" />
           </div>
-        </motion.div>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 pb-20">
-        <div className="grid gap-5 md:grid-cols-3">
+      <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
+        <div className="grid gap-4 sm:gap-5 md:grid-cols-3">
           {[
             { icon: Pickaxe, title: "One-tap mining", desc: "Claim 2 NJX every 24 hours. No effort, no battery drain." },
             { icon: Users, title: "Earn from friends", desc: "Get 0.5 NJX bonus every time a referral mines." },
             { icon: ShieldCheck, title: "KYC secure", desc: "Manual KYC review before withdrawal. Your account, protected." },
-          ].map((f, i) => (
-            <motion.div
+          ].map((f) => (
+            <div
               key={f.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="rounded-2xl border border-border/60 bg-card p-6 shadow-soft transition-smooth hover:shadow-elegant"
+              className="rounded-2xl border border-border/60 bg-card/60 p-6 shadow-soft backdrop-blur-sm transition-smooth hover:border-primary/30 hover:shadow-elegant"
             >
               <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground">
                 <f.icon className="h-5 w-5" />
               </div>
               <h3 className="font-display text-lg font-semibold">{f.title}</h3>
               <p className="mt-1.5 text-sm text-muted-foreground">{f.desc}</p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-3xl px-4 pb-24 text-center">
+      <section className="mx-auto max-w-3xl px-4 pb-24 text-center sm:px-6">
         <Trophy className="mx-auto h-10 w-10 text-gold" />
-        <h2 className="mt-4 text-3xl font-bold tracking-tight">Mine. Invite. Climb the leaderboard.</h2>
+        <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Mine. Invite. Climb the ranks.</h2>
         <p className="mt-3 text-muted-foreground">The earliest miners earn the most. Join now and lock in your rank.</p>
-        <Button asChild size="lg" className="mt-6 bg-gradient-primary text-primary-foreground shadow-elegant h-12 px-8">
+        <Button asChild size="lg" className="mt-7 h-12 bg-gradient-primary px-8 text-primary-foreground shadow-elegant">
           <Link to="/signup" search={{ ref: "" }}>Create free account</Link>
         </Button>
       </section>
