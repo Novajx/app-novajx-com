@@ -229,6 +229,36 @@ export type Database = {
         }
         Relationships: []
       }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          note: string | null
+          receiver_id: string
+          sender_id: string
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          note?: string | null
+          receiver_id: string
+          sender_id: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          note?: string | null
+          receiver_id?: string
+          sender_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -256,6 +286,8 @@ export type Database = {
           id: string
           referral_earnings: number
           total_mined: number
+          total_received: number
+          total_sent: number
           updated_at: string
           user_id: string
           withdrawal_address: string | null
@@ -265,6 +297,8 @@ export type Database = {
           id?: string
           referral_earnings?: number
           total_mined?: number
+          total_received?: number
+          total_sent?: number
           updated_at?: string
           user_id: string
           withdrawal_address?: string | null
@@ -274,6 +308,8 @@ export type Database = {
           id?: string
           referral_earnings?: number
           total_mined?: number
+          total_received?: number
+          total_sent?: number
           updated_at?: string
           user_id?: string
           withdrawal_address?: string | null
@@ -348,6 +384,14 @@ export type Database = {
         Returns: undefined
       }
       claim_mining: { Args: never; Returns: Json }
+      find_user_for_transfer: {
+        Args: { _query: string }
+        Returns: {
+          full_name: string
+          id: string
+          referral_code: string
+        }[]
+      }
       generate_referral_code: { Args: never; Returns: string }
       has_role: {
         Args: {
@@ -358,6 +402,10 @@ export type Database = {
       }
       request_withdrawal: {
         Args: { _amount: number; _wallet_address: string }
+        Returns: Json
+      }
+      transfer_njx: {
+        Args: { _amount: number; _note?: string; _recipient: string }
         Returns: Json
       }
     }
