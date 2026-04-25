@@ -2,7 +2,18 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Wallet as WalletIcon, ArrowUpRight, Loader2, ShieldAlert, CheckCircle2, Clock, XCircle } from "lucide-react";
+import {
+  Wallet as WalletIcon,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Send,
+  Loader2,
+  ShieldAlert,
+  CheckCircle2,
+  Clock,
+  XCircle,
+  Search,
+} from "lucide-react";
 import { RequireAuth } from "@/components/RequireAuth";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,15 +21,32 @@ import { useAuth } from "@/lib/auth";
 import { fmtNJX } from "@/lib/format";
 
 export const Route = createFileRoute("/wallet")({
-  component: () => <RequireAuth><AppShell><WalletPage /></AppShell></RequireAuth>,
+  component: () => (
+    <RequireAuth>
+      <AppShell>
+        <WalletPage />
+      </AppShell>
+    </RequireAuth>
+  ),
   head: () => ({ meta: [{ title: "Wallet — NovaJX" }] }),
 });
+
+type Tab = "send" | "withdraw" | "history";
 
 function WalletPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const [amount, setAmount] = useState("");
-  const [address, setAddress] = useState("");
+  const [tab, setTab] = useState<Tab>("send");
+
+  // Send NJX state
+  const [recipient, setRecipient] = useState("");
+  const [sendAmount, setSendAmount] = useState("");
+  const [lookup, setLookup] = useState<{ id: string; full_name: string; referral_code: string } | null>(null);
+  const [lookupErr, setLookupErr] = useState<string | null>(null);
+
+  // Withdraw state
+  const [wAmount, setWAmount] = useState("");
+  const [wAddress, setWAddress] = useState("");
 
   const { data: wallet, isLoading } = useQuery({
     queryKey: ["wallet", user?.id],
@@ -45,7 +73,7 @@ function WalletPage() {
     enabled: !!user,
   });
 
-  const { data: history } = useQuery({
+  const { data: withdrawals } = useQuery({
     queryKey: ["withdrawals", user?.id],
     queryFn: async () => {
       const { data } = await supabase
@@ -59,6 +87,38 @@ function WalletPage() {
     enabled: !!user,
   });
 
+  const { data: txs } = useQuery({
+    queryKey: ["transactions", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("transactions")
+        .select("*")
+        .or(`sender_id.eq.${user!.id},receiver_id.eq.${user!.id}`)
+        .order("created_at", { ascending: false })
+        .limit(30);
+      return data ?? [];
+    },
+    enabled: !!user,
+  });
+
+  // Fetch counterparty names
+  const counterpartyIds = Array.from(
+    new Set(
+      (txs ?? []).map((t) => (t.sender_id === user?.id ? t.receiver_id : t.sender_id)),
+    ),
+  );
+  const { data: counterparties } = useQuery({
+    queryKey: ["counterparties", counterpartyIds],
+    queryFn: async () => {
+      if (!counterpartyIds.length) return {} as Record<string, string>;
+      const { data } = await supabase.from("profiles").select("id,full_name,referral_code").in("id", counterpartyIds);
+      const map: Record<string, string> = {};
+      (data ?? []).forEach((p) => (map[p.id] = p.full_name || p.referral_code));
+      return map;
+    },
+    enabled: counterpartyIds.length > 0,
+  });
+
   const { data: minWithdrawal } = useQuery({
     queryKey: ["min-withdrawal"],
     queryFn: async () => {
@@ -67,27 +127,73 @@ function WalletPage() {
     },
   });
 
-  const withdraw = useMutation({
+  const lookupUser = async () => {
+    setLookupErr(null);
+    setLookup(null);
+    const q = recipient.trim();
+    if (!q) return;
+    const { data, error } = await supabase.rpc("find_user_for_transfer", { _query: q });
+    if (error || !data || (data as any).length === 0) {
+      setLookupErr("Recipient not found");
+      return;
+    }
+    const found = (data as any)[0];
+    if (found.id === user?.id) {
+      setLookupErr("You cannot send to yourself");
+      return;
+    }
+    setLookup(found);
+  };
+
+  const sendNjx = useMutation({
     mutationFn: async () => {
-      const amt = Number(amount);
-      if (!amt || amt <= 0) throw new Error("Enter a valid amount");
-      if (!address || address.trim().length < 6) throw new Error("Enter a valid wallet address");
-      const { error } = await supabase.rpc("request_withdrawal", { _amount: amt, _wallet_address: address.trim() });
+      const amt = Number(sendAmount);
+      if (!recipient.trim()) throw new Error("Enter a recipient");
+      if (!amt || amt <= 0) throw new Error("Amount must be greater than 0");
+      if (amt > Number(wallet?.balance ?? 0)) throw new Error("Insufficient balance");
+      const { error } = await supabase.rpc("transfer_njx", {
+        _recipient: recipient.trim(),
+        _amount: amt,
+      });
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Withdrawal requested!", { description: "Pending admin review." });
-      setAmount("");
-      setAddress("");
+      toast.success("Transfer sent!", { description: `${sendAmount} NJX delivered.` });
+      setRecipient("");
+      setSendAmount("");
+      setLookup(null);
       qc.invalidateQueries();
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
-  if (isLoading) return <div className="flex h-64 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  const withdraw = useMutation({
+    mutationFn: async () => {
+      const amt = Number(wAmount);
+      if (!amt || amt <= 0) throw new Error("Enter a valid amount");
+      if (!wAddress || wAddress.trim().length < 6) throw new Error("Enter a valid wallet address");
+      const { error } = await supabase.rpc("request_withdrawal", { _amount: amt, _wallet_address: wAddress.trim() });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Withdrawal requested!", { description: "Pending admin review." });
+      setWAmount("");
+      setWAddress("");
+      qc.invalidateQueries();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  if (isLoading)
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
 
   const kycApproved = kyc?.status === "approved";
   const min = minWithdrawal ?? 50;
+  const balance = Number(wallet?.balance ?? 0);
 
   return (
     <div className="space-y-5">
@@ -96,93 +202,260 @@ function WalletPage() {
         <div className="flex items-center gap-2 text-sm opacity-80">
           <WalletIcon className="h-4 w-4" /> Available balance
         </div>
-        <p className="mt-1 font-display text-4xl font-bold">{fmtNJX(wallet?.balance, 2)} <span className="text-xl opacity-90">NJX</span></p>
-        <p className="mt-1 text-xs opacity-75">Min. withdrawal: {min} NJX</p>
+        <p className="mt-1 font-display text-4xl font-bold">
+          {fmtNJX(wallet?.balance, 2)} <span className="text-xl opacity-90">NJX</span>
+        </p>
+        <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
+          <div className="rounded-xl bg-white/10 px-3 py-2 backdrop-blur">
+            <p className="opacity-75">Total sent</p>
+            <p className="mt-0.5 font-semibold">{fmtNJX((wallet as any)?.total_sent ?? 0, 2)} NJX</p>
+          </div>
+          <div className="rounded-xl bg-white/10 px-3 py-2 backdrop-blur">
+            <p className="opacity-75">Total received</p>
+            <p className="mt-0.5 font-semibold">{fmtNJX((wallet as any)?.total_received ?? 0, 2)} NJX</p>
+          </div>
+        </div>
       </div>
 
-      {/* KYC gate */}
-      {!kycApproved && (
-        <div className="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
-          <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
-          <div className="flex-1">
-            <p className="font-semibold">KYC verification required</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              {kyc?.status === "pending" ? "Your KYC is under review." : "Complete KYC to unlock withdrawals."}
-            </p>
-            <Link to={"/kyc" as any} className="mt-2 inline-block text-xs font-semibold text-primary underline">
-              {kyc?.status === "pending" ? "View status →" : "Verify now →"}
-            </Link>
+      {/* Tabs */}
+      <div className="flex gap-1 rounded-2xl border border-border/60 bg-card p-1">
+        {([
+          { key: "send", label: "Send", icon: Send },
+          { key: "withdraw", label: "Withdraw", icon: ArrowUpRight },
+          { key: "history", label: "History", icon: Clock },
+        ] as const).map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-sm font-medium transition-smooth ${
+              tab === t.key
+                ? "bg-gradient-primary text-primary-foreground shadow-soft"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <t.icon className="h-4 w-4" />
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* SEND TAB */}
+      {tab === "send" && (
+        <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
+          <h2 className="font-display text-lg font-bold">Send NJX</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Transfer NJX instantly to another NovaJX user.
+          </p>
+          <div className="mt-4 space-y-3">
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                Recipient (Email or Referral Code)
+              </span>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={recipient}
+                  onChange={(e) => {
+                    setRecipient(e.target.value);
+                    setLookup(null);
+                    setLookupErr(null);
+                  }}
+                  className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary"
+                  placeholder="user@email.com or NJXABC12"
+                />
+                <button
+                  type="button"
+                  onClick={lookupUser}
+                  disabled={!recipient.trim()}
+                  className="flex items-center gap-1 rounded-xl border border-border bg-background px-3 text-xs font-semibold transition-smooth hover:bg-accent disabled:opacity-50"
+                >
+                  <Search className="h-3.5 w-3.5" /> Find
+                </button>
+              </div>
+              {lookup && (
+                <p className="mt-1.5 text-xs text-emerald-500">
+                  ✓ Sending to <strong>{lookup.full_name || lookup.referral_code}</strong>
+                </p>
+              )}
+              {lookupErr && <p className="mt-1.5 text-xs text-red-500">{lookupErr}</p>}
+            </label>
+
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Amount (NJX)</span>
+              <input
+                type="number"
+                value={sendAmount}
+                step="0.01"
+                min="0.01"
+                max={balance}
+                onChange={(e) => setSendAmount(e.target.value)}
+                className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary"
+                placeholder="0.00"
+              />
+              <p className="mt-1 text-[11px] text-muted-foreground">Available: {fmtNJX(balance, 2)} NJX</p>
+            </label>
+
+            <button
+              onClick={() => sendNjx.mutate()}
+              disabled={sendNjx.isPending || !recipient.trim() || !sendAmount}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-elegant transition-bounce hover:scale-[1.02] disabled:scale-100 disabled:opacity-60"
+            >
+              {sendNjx.isPending ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <>
+                  <Send className="h-4 w-4" /> Send NJX
+                </>
+              )}
+            </button>
           </div>
         </div>
       )}
 
-      {/* Withdraw form */}
-      <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
-        <h2 className="font-display text-lg font-bold">Withdraw NJX</h2>
-        <div className="mt-4 space-y-3">
-          <label className="block">
-            <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Amount (NJX)</span>
-            <input
-              type="number"
-              value={amount}
-              min={min}
-              max={wallet?.balance ?? 0}
-              onChange={(e) => setAmount(e.target.value)}
-              disabled={!kycApproved}
-              className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary disabled:opacity-50"
-              placeholder={`Minimum ${min}`}
-            />
-          </label>
-          <label className="block">
-            <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Wallet Address</span>
-            <input
-              type="text"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              disabled={!kycApproved}
-              className="w-full rounded-xl border border-border bg-background px-4 py-2.5 font-mono text-sm outline-none focus:border-primary disabled:opacity-50"
-              placeholder="0x..."
-            />
-          </label>
-          <button
-            onClick={() => withdraw.mutate()}
-            disabled={!kycApproved || withdraw.isPending}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-elegant transition-bounce hover:scale-[1.02] disabled:opacity-60"
-          >
-            {withdraw.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <><ArrowUpRight className="h-4 w-4" /> Request Withdrawal</>}
-          </button>
-        </div>
-      </div>
+      {/* WITHDRAW TAB */}
+      {tab === "withdraw" && (
+        <>
+          {!kycApproved && (
+            <div className="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
+              <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
+              <div className="flex-1">
+                <p className="font-semibold">KYC verification required</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {kyc?.status === "pending"
+                    ? "Your KYC is under review."
+                    : "Complete KYC to unlock withdrawals."}
+                </p>
+                <Link to={"/kyc" as any} className="mt-2 inline-block text-xs font-semibold text-primary underline">
+                  {kyc?.status === "pending" ? "View status →" : "Verify now →"}
+                </Link>
+              </div>
+            </div>
+          )}
 
-      {/* History */}
-      <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
-        <h2 className="font-display text-lg font-bold">Withdrawal history</h2>
-        {!history?.length ? (
-          <p className="mt-4 text-center text-sm text-muted-foreground">No withdrawals yet.</p>
-        ) : (
-          <ul className="mt-4 divide-y divide-border/50">
-            {history.map((w) => {
-              const status = {
-                pending: { Icon: Clock, color: "text-amber-500", label: "Pending" },
-                approved: { Icon: Clock, color: "text-blue-500", label: "Approved" },
-                paid: { Icon: CheckCircle2, color: "text-emerald-500", label: "Paid" },
-                rejected: { Icon: XCircle, color: "text-red-500", label: "Rejected" },
-              }[w.status];
-              return (
-                <li key={w.id} className="flex items-center justify-between py-3">
-                  <div>
-                    <p className="font-semibold">{fmtNJX(w.amount, 2)} NJX</p>
-                    <p className="text-xs text-muted-foreground">{new Date(w.created_at).toLocaleDateString()}</p>
-                  </div>
-                  <div className={`flex items-center gap-1.5 text-xs font-medium ${status.color}`}>
-                    <status.Icon className="h-3.5 w-3.5" /> {status.label}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </div>
+          <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
+            <h2 className="font-display text-lg font-bold">Withdraw NJX</h2>
+            <p className="mt-1 text-xs text-muted-foreground">Min. withdrawal: {min} NJX</p>
+            <div className="mt-4 space-y-3">
+              <label className="block">
+                <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Amount (NJX)</span>
+                <input
+                  type="number"
+                  value={wAmount}
+                  min={min}
+                  max={balance}
+                  onChange={(e) => setWAmount(e.target.value)}
+                  disabled={!kycApproved}
+                  className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary disabled:opacity-50"
+                  placeholder={`Minimum ${min}`}
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Wallet Address</span>
+                <input
+                  type="text"
+                  value={wAddress}
+                  onChange={(e) => setWAddress(e.target.value)}
+                  disabled={!kycApproved}
+                  className="w-full rounded-xl border border-border bg-background px-4 py-2.5 font-mono text-sm outline-none focus:border-primary disabled:opacity-50"
+                  placeholder="0x..."
+                />
+              </label>
+              <button
+                onClick={() => withdraw.mutate()}
+                disabled={!kycApproved || withdraw.isPending}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-elegant transition-bounce hover:scale-[1.02] disabled:scale-100 disabled:opacity-60"
+              >
+                {withdraw.isPending ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <>
+                    <ArrowUpRight className="h-4 w-4" /> Request Withdrawal
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* HISTORY TAB */}
+      {tab === "history" && (
+        <div className="space-y-5">
+          <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
+            <h2 className="font-display text-lg font-bold">Transfers</h2>
+            {!txs?.length ? (
+              <p className="mt-4 text-center text-sm text-muted-foreground">No transfers yet.</p>
+            ) : (
+              <ul className="mt-4 divide-y divide-border/50">
+                {txs.map((t) => {
+                  const isSent = t.sender_id === user?.id;
+                  const otherId = isSent ? t.receiver_id : t.sender_id;
+                  const name = counterparties?.[otherId] ?? otherId.slice(0, 8);
+                  const Icon = isSent ? ArrowUpRight : ArrowDownLeft;
+                  return (
+                    <li key={t.id} className="flex items-center justify-between gap-3 py-3">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`flex h-9 w-9 items-center justify-center rounded-full ${
+                            isSent ? "bg-red-500/10 text-red-500" : "bg-emerald-500/10 text-emerald-500"
+                          }`}
+                        >
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold">{isSent ? "Sent to" : "Received from"} {name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(t.created_at).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                      <p
+                        className={`shrink-0 text-sm font-bold ${
+                          isSent ? "text-red-500" : "text-emerald-500"
+                        }`}
+                      >
+                        {isSent ? "-" : "+"}
+                        {fmtNJX(t.amount, 2)} NJX
+                      </p>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+
+          <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
+            <h2 className="font-display text-lg font-bold">Withdrawals</h2>
+            {!withdrawals?.length ? (
+              <p className="mt-4 text-center text-sm text-muted-foreground">No withdrawals yet.</p>
+            ) : (
+              <ul className="mt-4 divide-y divide-border/50">
+                {withdrawals.map((w) => {
+                  const status = {
+                    pending: { Icon: Clock, color: "text-amber-500", label: "Pending" },
+                    approved: { Icon: Clock, color: "text-blue-500", label: "Approved" },
+                    paid: { Icon: CheckCircle2, color: "text-emerald-500", label: "Paid" },
+                    rejected: { Icon: XCircle, color: "text-red-500", label: "Rejected" },
+                  }[w.status];
+                  return (
+                    <li key={w.id} className="flex items-center justify-between py-3">
+                      <div>
+                        <p className="font-semibold">{fmtNJX(w.amount, 2)} NJX</p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(w.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className={`flex items-center gap-1.5 text-xs font-medium ${status.color}`}>
+                        <status.Icon className="h-3.5 w-3.5" /> {status.label}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
