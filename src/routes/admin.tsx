@@ -208,7 +208,9 @@ function KycTab() {
 
   const review = useMutation({
     mutationFn: async ({ id, action, reason }: { id: string; action: "approve" | "reject"; reason?: string }) => {
-      const { error } = await supabase.rpc("admin_review_kyc", { _kyc_id: id, _action: action, _reason: reason ?? null });
+      const args: { _kyc_id: string; _action: string; _reason?: string } = { _kyc_id: id, _action: action };
+      if (reason) args._reason = reason;
+      const { error } = await supabase.rpc("admin_review_kyc", args);
       if (error) throw error;
     },
     onSuccess: (_, v) => {
@@ -335,9 +337,10 @@ function WithdrawalsTab() {
 
   const process = useMutation({
     mutationFn: async ({ id, action, tx, note }: { id: string; action: "approve" | "reject"; tx?: string; note?: string }) => {
-      const { error } = await supabase.rpc("admin_process_withdrawal", {
-        _request_id: id, _action: action, _tx_hash: tx ?? null, _note: note ?? null,
-      });
+      const args: { _request_id: string; _action: string; _tx_hash?: string; _note?: string } = { _request_id: id, _action: action };
+      if (tx) args._tx_hash = tx;
+      if (note) args._note = note;
+      const { error } = await supabase.rpc("admin_process_withdrawal", args);
       if (error) throw error;
     },
     onSuccess: (_, v) => {
