@@ -737,6 +737,7 @@ function WalletPage() {
                   const otherId = isSent ? t.receiver_id : t.sender_id;
                   const name = counterparties?.[otherId] ?? otherId.slice(0, 8);
                   const Icon = isSent ? ArrowUpRight : ArrowDownLeft;
+                  const unit = t.type === "rnt_transfer" ? "RNT" : "NJX";
                   return (
                     <li key={t.id} className="flex items-center justify-between gap-3 py-3">
                       <div className="flex items-center gap-3">
@@ -760,7 +761,7 @@ function WalletPage() {
                         }`}
                       >
                         {isSent ? "-" : "+"}
-                        {fmtNJX(t.amount, 2)} NJX
+                        {fmtNJX(t.amount, 2)} {unit}
                       </p>
                     </li>
                   );
