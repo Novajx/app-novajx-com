@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { User as UserIcon, LogOut, Copy, ShieldCheck, Loader2, Mail } from "lucide-react";
+import { User as UserIcon, LogOut, Copy, ShieldCheck, Loader2, Mail, FileText, Wallet as WalletIcon } from "lucide-react";
 import { RequireAuth } from "@/components/RequireAuth";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
@@ -157,14 +157,18 @@ function ProfilePage() {
       </div>
 
       {/* Quick links */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         <Link to={"/kyc" as any} className="rounded-2xl border border-border/60 bg-card p-4 text-center shadow-soft transition-smooth hover:border-primary">
           <ShieldCheck className="mx-auto h-5 w-5 text-primary" />
           <p className="mt-1.5 text-sm font-semibold">KYC</p>
         </Link>
         <Link to={"/wallet" as any} className="rounded-2xl border border-border/60 bg-card p-4 text-center shadow-soft transition-smooth hover:border-primary">
-          <UserIcon className="mx-auto h-5 w-5 text-primary" />
+          <WalletIcon className="mx-auto h-5 w-5 text-primary" />
           <p className="mt-1.5 text-sm font-semibold">Wallet</p>
+        </Link>
+        <Link to={"/terms" as any} className="rounded-2xl border border-border/60 bg-card p-4 text-center shadow-soft transition-smooth hover:border-primary">
+          <FileText className="mx-auto h-5 w-5 text-primary" />
+          <p className="mt-1.5 text-sm font-semibold">Terms</p>
         </Link>
       </div>
 
