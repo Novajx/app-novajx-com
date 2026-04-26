@@ -292,6 +292,7 @@ export type Database = {
           id: string
           locked_balance: number
           referral_earnings: number
+          rnt_balance: number
           total_mined: number
           total_received: number
           total_sent: number
@@ -304,6 +305,7 @@ export type Database = {
           id?: string
           locked_balance?: number
           referral_earnings?: number
+          rnt_balance?: number
           total_mined?: number
           total_received?: number
           total_sent?: number
@@ -316,6 +318,7 @@ export type Database = {
           id?: string
           locked_balance?: number
           referral_earnings?: number
+          rnt_balance?: number
           total_mined?: number
           total_received?: number
           total_sent?: number
@@ -415,6 +418,10 @@ export type Database = {
       }
       swap_njx: { Args: { _amount: number }; Returns: Json }
       transfer_njx: {
+        Args: { _amount: number; _note?: string; _recipient: string }
+        Returns: Json
+      }
+      transfer_rnt: {
         Args: { _amount: number; _note?: string; _recipient: string }
         Returns: Json
       }
