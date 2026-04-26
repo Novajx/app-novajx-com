@@ -13,6 +13,8 @@ import {
   Clock,
   XCircle,
   Search,
+  Lock,
+  Repeat,
 } from "lucide-react";
 import { RequireAuth } from "@/components/RequireAuth";
 import { AppShell } from "@/components/AppShell";
@@ -31,7 +33,7 @@ export const Route = createFileRoute("/wallet")({
   head: () => ({ meta: [{ title: "Wallet — NovaJX" }] }),
 });
 
-type Tab = "send" | "withdraw" | "history";
+type Tab = "send" | "swap" | "withdraw" | "history";
 
 function WalletPage() {
   const { user } = useAuth();
@@ -47,6 +49,9 @@ function WalletPage() {
   // Withdraw state
   const [wAmount, setWAmount] = useState("");
   const [wAddress, setWAddress] = useState("");
+
+  // Swap state
+  const [swapAmount, setSwapAmount] = useState("");
 
   const { data: wallet, isLoading } = useQuery({
     queryKey: ["wallet", user?.id],
@@ -71,6 +76,32 @@ function WalletPage() {
       return data;
     },
     enabled: !!user,
+  });
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile-kyc-approved-at", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user!.id)
+        .maybeSingle();
+      return data as any;
+    },
+    enabled: !!user,
+  });
+
+  const { data: swapSettings } = useQuery({
+    queryKey: ["swap-settings"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("app_settings")
+        .select("key,value")
+        .in("key", ["min_swap", "swap_lock_days"]);
+      const map: Record<string, number> = {};
+      (data ?? []).forEach((r: any) => (map[r.key] = Number(r.value)));
+      return { minSwap: map.min_swap ?? 50, lockDays: map.swap_lock_days ?? 20 };
+    },
   });
 
   const { data: withdrawals } = useQuery({
@@ -123,7 +154,7 @@ function WalletPage() {
     queryKey: ["min-withdrawal"],
     queryFn: async () => {
       const { data } = await supabase.from("app_settings").select("value").eq("key", "min_withdrawal").maybeSingle();
-      return Number(data?.value ?? 50);
+      return Number(data?.value ?? 40);
     },
   });
 
@@ -184,6 +215,21 @@ function WalletPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const swap = useMutation({
+    mutationFn: async () => {
+      const amt = Number(swapAmount);
+      if (!amt || amt <= 0) throw new Error("Enter a valid amount");
+      const { error } = await (supabase as any).rpc("swap_njx", { _amount: amt });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Swap successful!", { description: `${swapAmount} NJX moved to wallet.` });
+      setSwapAmount("");
+      qc.invalidateQueries();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   if (isLoading)
     return (
       <div className="flex h-64 items-center justify-center">
@@ -192,48 +238,65 @@ function WalletPage() {
     );
 
   const kycApproved = kyc?.status === "approved";
-  const min = minWithdrawal ?? 50;
+  const min = minWithdrawal ?? 40;
   const balance = Number(wallet?.balance ?? 0);
+  const locked = Number((wallet as any)?.locked_balance ?? 0);
+
+  // Swap eligibility
+  const minSwap = swapSettings?.minSwap ?? 50;
+  const lockDays = swapSettings?.lockDays ?? 20;
+  const approvedAt = profile?.kyc_approved_at ? new Date(profile.kyc_approved_at) : null;
+  const unlockDate = approvedAt ? new Date(approvedAt.getTime() + lockDays * 86400000) : null;
+  const daysRemaining = unlockDate
+    ? Math.max(0, Math.ceil((unlockDate.getTime() - Date.now()) / 86400000))
+    : null;
+  const swapTimeOk = !!unlockDate && unlockDate.getTime() <= Date.now();
+  const canSwap = kycApproved && swapTimeOk && locked >= minSwap;
 
   return (
     <div className="space-y-5">
       {/* Balance */}
       <div className="rounded-3xl bg-gradient-primary p-7 text-primary-foreground shadow-elegant">
         <div className="flex items-center gap-2 text-sm opacity-80">
-          <WalletIcon className="h-4 w-4" /> Available balance
+          <WalletIcon className="h-4 w-4" /> Wallet balance
         </div>
         <p className="mt-1 font-display text-4xl font-bold">
           {fmtNJX(wallet?.balance, 2)} <span className="text-xl opacity-90">NJX</span>
         </p>
-        <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
+        <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
           <div className="rounded-xl bg-white/10 px-3 py-2 backdrop-blur">
-            <p className="opacity-75">Total sent</p>
-            <p className="mt-0.5 font-semibold">{fmtNJX((wallet as any)?.total_sent ?? 0, 2)} NJX</p>
+            <p className="flex items-center gap-1 opacity-75"><Lock className="h-3 w-3" /> Locked</p>
+            <p className="mt-0.5 font-semibold">{fmtNJX(locked, 2)}</p>
           </div>
           <div className="rounded-xl bg-white/10 px-3 py-2 backdrop-blur">
-            <p className="opacity-75">Total received</p>
-            <p className="mt-0.5 font-semibold">{fmtNJX((wallet as any)?.total_received ?? 0, 2)} NJX</p>
+            <p className="opacity-75">Sent</p>
+            <p className="mt-0.5 font-semibold">{fmtNJX((wallet as any)?.total_sent ?? 0, 2)}</p>
+          </div>
+          <div className="rounded-xl bg-white/10 px-3 py-2 backdrop-blur">
+            <p className="opacity-75">Received</p>
+            <p className="mt-0.5 font-semibold">{fmtNJX((wallet as any)?.total_received ?? 0, 2)}</p>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 rounded-2xl border border-border/60 bg-card p-1">
+      <div className="grid grid-cols-4 gap-1 rounded-2xl border border-border/60 bg-card p-1">
         {([
           { key: "send", label: "Send", icon: Send },
+          { key: "swap", label: "Swap", icon: Repeat },
           { key: "withdraw", label: "Withdraw", icon: ArrowUpRight },
           { key: "history", label: "History", icon: Clock },
         ] as const).map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-sm font-medium transition-smooth ${
+            className={`flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-medium transition-smooth ${
               tab === t.key
                 ? "bg-gradient-primary text-primary-foreground shadow-soft"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <t.icon className="h-4 w-4" />
+            <t.icon className="h-3.5 w-3.5" />
             {t.label}
           </button>
         ))}
