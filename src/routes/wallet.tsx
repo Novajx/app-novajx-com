@@ -15,6 +15,7 @@ import {
   Search,
   Lock,
   Repeat,
+  Gift,
 } from "lucide-react";
 import { RequireAuth } from "@/components/RequireAuth";
 import { AppShell } from "@/components/AppShell";
@@ -33,7 +34,7 @@ export const Route = createFileRoute("/wallet")({
   head: () => ({ meta: [{ title: "Wallet — NovaJX" }] }),
 });
 
-type Tab = "send" | "swap" | "withdraw" | "history";
+type Tab = "send" | "swap" | "rnt" | "withdraw" | "history";
 
 function WalletPage() {
   const { user } = useAuth();
@@ -45,6 +46,10 @@ function WalletPage() {
   const [sendAmount, setSendAmount] = useState("");
   const [lookup, setLookup] = useState<{ id: string; full_name: string; referral_code: string } | null>(null);
   const [lookupErr, setLookupErr] = useState<string | null>(null);
+
+  // RNT transfer state
+  const [rntRecipient, setRntRecipient] = useState("");
+  const [rntAmount, setRntAmount] = useState("");
 
   // Withdraw state
   const [wAmount, setWAmount] = useState("");
@@ -230,6 +235,27 @@ function WalletPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const sendRnt = useMutation({
+    mutationFn: async () => {
+      const amt = Number(rntAmount);
+      if (!rntRecipient.trim()) throw new Error("Enter a recipient");
+      if (!amt || amt <= 0) throw new Error("Amount must be greater than 0");
+      if (amt > Number((wallet as any)?.rnt_balance ?? 0)) throw new Error("Insufficient RNT balance");
+      const { error } = await (supabase as any).rpc("transfer_rnt", {
+        _recipient: rntRecipient.trim(),
+        _amount: amt,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("RNT sent!", { description: `${rntAmount} RNT delivered.` });
+      setRntRecipient("");
+      setRntAmount("");
+      qc.invalidateQueries();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   if (isLoading)
     return (
       <div className="flex h-64 items-center justify-center">
@@ -241,6 +267,7 @@ function WalletPage() {
   const min = minWithdrawal ?? 40;
   const balance = Number(wallet?.balance ?? 0);
   const locked = Number((wallet as any)?.locked_balance ?? 0);
+  const rnt = Number((wallet as any)?.rnt_balance ?? 0);
 
   // Swap eligibility
   const minSwap = swapSettings?.minSwap ?? 50;
@@ -291,11 +318,41 @@ function WalletPage() {
         </div>
       </div>
 
+      {/* RNT Balance */}
+      <div className="rounded-3xl border border-border/60 bg-card p-5 shadow-soft">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Gift className="h-3.5 w-3.5 text-primary" />
+              <span className="font-semibold uppercase tracking-wider">RNT Balance</span>
+            </div>
+            <p className="mt-1 font-display text-3xl font-bold">
+              {fmtNJX(rnt, 2)} <span className="text-base text-muted-foreground">RNT</span>
+            </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">Referral Reward Token</p>
+            <p className="mt-2 inline-block rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary">
+              1 RNT = 5 NJX (display value only)
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setTab("rnt")}
+            className="shrink-0 rounded-xl border border-border bg-background px-3 py-2 text-xs font-semibold transition-smooth hover:border-primary"
+          >
+            Send RNT
+          </button>
+        </div>
+        <p className="mt-3 rounded-lg bg-muted/60 px-3 py-2 text-[11px] text-muted-foreground">
+          RNT cannot be swapped, converted, or withdrawn. Transfers between users only.
+        </p>
+      </div>
+
       {/* Tabs */}
-      <div className="grid grid-cols-4 gap-1 rounded-2xl border border-border/60 bg-card p-1">
+      <div className="grid grid-cols-5 gap-1 rounded-2xl border border-border/60 bg-card p-1">
         {([
           { key: "send", label: "Send", icon: Send },
           { key: "swap", label: "Swap", icon: Repeat },
+          { key: "rnt", label: "RNT", icon: Gift },
           { key: "withdraw", label: "Withdraw", icon: ArrowUpRight },
           { key: "history", label: "History", icon: Clock },
         ] as const).map((t) => (
