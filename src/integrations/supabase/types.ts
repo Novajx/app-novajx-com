@@ -121,6 +121,7 @@ export type Database = {
           email: string | null
           full_name: string
           id: string
+          kyc_approved_at: string | null
           phone: string | null
           referral_code: string
           referred_by: string | null
@@ -132,6 +133,7 @@ export type Database = {
           email?: string | null
           full_name?: string
           id: string
+          kyc_approved_at?: string | null
           phone?: string | null
           referral_code: string
           referred_by?: string | null
@@ -143,6 +145,7 @@ export type Database = {
           email?: string | null
           full_name?: string
           id?: string
+          kyc_approved_at?: string | null
           phone?: string | null
           referral_code?: string
           referred_by?: string | null
@@ -238,6 +241,7 @@ export type Database = {
           receiver_id: string
           sender_id: string
           status: string
+          type: string
         }
         Insert: {
           amount: number
@@ -247,6 +251,7 @@ export type Database = {
           receiver_id: string
           sender_id: string
           status?: string
+          type?: string
         }
         Update: {
           amount?: number
@@ -256,6 +261,7 @@ export type Database = {
           receiver_id?: string
           sender_id?: string
           status?: string
+          type?: string
         }
         Relationships: []
       }
@@ -284,6 +290,7 @@ export type Database = {
         Row: {
           balance: number
           id: string
+          locked_balance: number
           referral_earnings: number
           total_mined: number
           total_received: number
@@ -295,6 +302,7 @@ export type Database = {
         Insert: {
           balance?: number
           id?: string
+          locked_balance?: number
           referral_earnings?: number
           total_mined?: number
           total_received?: number
@@ -306,6 +314,7 @@ export type Database = {
         Update: {
           balance?: number
           id?: string
+          locked_balance?: number
           referral_earnings?: number
           total_mined?: number
           total_received?: number
@@ -404,6 +413,7 @@ export type Database = {
         Args: { _amount: number; _wallet_address: string }
         Returns: Json
       }
+      swap_njx: { Args: { _amount: number }; Returns: Json }
       transfer_njx: {
         Args: { _amount: number; _note?: string; _recipient: string }
         Returns: Json
