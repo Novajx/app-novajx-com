@@ -166,9 +166,9 @@ function ProfilePage() {
           <WalletIcon className="mx-auto h-5 w-5 text-primary" />
           <p className="mt-1.5 text-sm font-semibold">Wallet</p>
         </Link>
-        <Link to={"/terms" as any} className="rounded-2xl border border-border/60 bg-card p-4 text-center shadow-soft transition-smooth hover:border-primary">
+        <Link to={"/referrals" as any} className="rounded-2xl border border-border/60 bg-card p-4 text-center shadow-soft transition-smooth hover:border-primary">
           <FileText className="mx-auto h-5 w-5 text-primary" />
-          <p className="mt-1.5 text-sm font-semibold">Terms</p>
+          <p className="mt-1.5 text-sm font-semibold">Referrals</p>
         </Link>
       </div>
 
