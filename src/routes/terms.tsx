@@ -5,7 +5,12 @@ import { AppShell } from "@/components/AppShell";
 
 export const Route = createFileRoute("/terms")({
   component: () => <RequireAuth><AppShell><TermsPage /></AppShell></RequireAuth>,
-  head: () => ({ meta: [{ title: "Terms & Conditions — NovaJX" }] }),
+  head: () => ({
+    meta: [
+      { title: "Terms & Conditions — NovaJX" },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
 });
 
 const SECTIONS: { title: string; body: React.ReactNode }[] = [
