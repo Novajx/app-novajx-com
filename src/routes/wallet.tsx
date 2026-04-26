@@ -253,6 +253,18 @@ function WalletPage() {
   const swapTimeOk = !!unlockDate && unlockDate.getTime() <= Date.now();
   const canSwap = kycApproved && swapTimeOk && locked >= minSwap;
 
+  // Transfer eligibility (mirrors backend transfer_njx gates)
+  const transferTimeOk = swapTimeOk; // same 20-day window from kyc_approved_at
+  const hasAvailable = balance > 0;
+  const canSend = kycApproved && transferTimeOk && hasAvailable;
+  const sendBlockReason = !kycApproved
+    ? "KYC approval required to send credits"
+    : !transferTimeOk
+      ? `Transfers available after ${lockDays} days of KYC approval`
+      : !hasAvailable
+        ? "No available credits. Convert your credits first"
+        : null;
+
   return (
     <div className="space-y-5">
       {/* Balance */}
