@@ -580,6 +580,83 @@ function WalletPage() {
         </div>
       )}
 
+      {/* RNT TAB */}
+      {tab === "rnt" && (
+        <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
+          <div className="flex items-center gap-2">
+            <Gift className="h-5 w-5 text-primary" />
+            <h2 className="font-display text-lg font-bold">Send RNT</h2>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Transfer Referral Reward Tokens to another NovaJX user. RNT cannot be swapped or withdrawn.
+          </p>
+
+          <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+            <div className="rounded-xl border border-border/60 bg-background px-3 py-2">
+              <p className="text-muted-foreground">RNT Balance</p>
+              <p className="mt-0.5 font-display text-base font-bold">{fmtNJX(rnt, 2)}</p>
+            </div>
+            <div className="rounded-xl border border-border/60 bg-background px-3 py-2">
+              <p className="text-muted-foreground">Display Value</p>
+              <p className="mt-0.5 font-display text-base font-bold">{fmtNJX(rnt * 5, 2)} NJX</p>
+              <p className="text-[10px] text-muted-foreground">1 RNT = 5 NJX (display only)</p>
+            </div>
+          </div>
+
+          <div className="mt-4 space-y-3">
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                Recipient (Email or Referral Code)
+              </span>
+              <input
+                type="text"
+                value={rntRecipient}
+                onChange={(e) => setRntRecipient(e.target.value)}
+                disabled={rnt <= 0}
+                className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary disabled:opacity-50"
+                placeholder="user@email.com or NJXABC12"
+              />
+            </label>
+
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Amount (RNT)</span>
+              <input
+                type="number"
+                value={rntAmount}
+                step="0.01"
+                min="0.01"
+                max={rnt}
+                onChange={(e) => setRntAmount(e.target.value)}
+                disabled={rnt <= 0}
+                className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary disabled:opacity-50"
+                placeholder="0.00"
+              />
+              <p className="mt-1 text-[11px] text-muted-foreground">Available: {fmtNJX(rnt, 2)} RNT</p>
+            </label>
+
+            {rnt <= 0 && (
+              <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-600">
+                You don't have any RNT yet. Invite friends to earn 1 RNT per successful signup.
+              </p>
+            )}
+
+            <button
+              onClick={() => sendRnt.mutate()}
+              disabled={rnt <= 0 || sendRnt.isPending || !rntRecipient.trim() || !rntAmount}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-elegant transition-bounce hover:scale-[1.02] disabled:scale-100 disabled:opacity-60"
+            >
+              {sendRnt.isPending ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <>
+                  <Send className="h-4 w-4" /> Send RNT
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* WITHDRAW TAB */}
       {tab === "withdraw" && (
         <>
