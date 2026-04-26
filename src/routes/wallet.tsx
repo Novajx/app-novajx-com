@@ -375,6 +375,96 @@ function WalletPage() {
         </div>
       )}
 
+      {/* SWAP TAB */}
+      {tab === "swap" && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-soft">
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Lock className="h-3.5 w-3.5" /> Locked
+              </p>
+              <p className="mt-1 font-display text-2xl font-bold">{fmtNJX(locked, 2)}</p>
+              <p className="text-[11px] text-muted-foreground">NJX (mined)</p>
+            </div>
+            <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-soft">
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <WalletIcon className="h-3.5 w-3.5" /> Wallet
+              </p>
+              <p className="mt-1 font-display text-2xl font-bold">{fmtNJX(balance, 2)}</p>
+              <p className="text-[11px] text-muted-foreground">NJX (usable)</p>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
+            <h2 className="font-display text-lg font-bold">Swap Locked → Wallet</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Move your mined coins into your spendable wallet. Min {minSwap} NJX. Available {lockDays} days after KYC approval.
+            </p>
+
+            {!kycApproved && (
+              <div className="mt-4 flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
+                <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
+                <div className="flex-1">
+                  <p className="font-semibold">KYC required</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    Approve KYC to unlock the swap feature.
+                  </p>
+                  <Link to={"/kyc" as any} className="mt-2 inline-block text-xs font-semibold text-primary underline">
+                    Verify now →
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {kycApproved && !swapTimeOk && (
+              <div className="mt-4 flex items-start gap-3 rounded-2xl border border-blue-500/30 bg-blue-500/10 p-4 text-sm">
+                <Clock className="mt-0.5 h-5 w-5 shrink-0 text-blue-500" />
+                <div className="flex-1">
+                  <p className="font-semibold">Swap available in {daysRemaining} day{daysRemaining === 1 ? "" : "s"}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    Unlocks on {unlockDate?.toLocaleDateString()}.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <div className="mt-4 space-y-3">
+              <label className="block">
+                <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Amount (NJX)</span>
+                <input
+                  type="number"
+                  value={swapAmount}
+                  min={minSwap}
+                  max={locked}
+                  step="0.01"
+                  onChange={(e) => setSwapAmount(e.target.value)}
+                  disabled={!canSwap}
+                  className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary disabled:opacity-50"
+                  placeholder={`Minimum ${minSwap}`}
+                />
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Locked: {fmtNJX(locked, 2)} NJX
+                </p>
+              </label>
+
+              <button
+                onClick={() => swap.mutate()}
+                disabled={!canSwap || swap.isPending || !swapAmount}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-elegant transition-bounce hover:scale-[1.02] disabled:scale-100 disabled:opacity-60"
+              >
+                {swap.isPending ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <>
+                    <Repeat className="h-4 w-4" /> Swap Now
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* WITHDRAW TAB */}
       {tab === "withdraw" && (
         <>
