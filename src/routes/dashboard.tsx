@@ -93,19 +93,23 @@ function Dashboard() {
         animate={{ opacity: 1, y: 0 }}
         className="overflow-hidden rounded-3xl bg-gradient-primary p-7 text-primary-foreground shadow-elegant"
       >
-        <p className="text-sm opacity-80">Total balance</p>
+        <p className="text-sm opacity-80">Wallet balance</p>
         <div className="mt-1 flex items-baseline gap-2">
           <span className="font-display text-5xl font-bold">{fmtNJX(wallet?.balance, 2)}</span>
           <span className="text-lg opacity-90">NJX</span>
         </div>
-        <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
+        <div className="mt-5 grid grid-cols-3 gap-2 text-sm">
           <div className="rounded-xl bg-white/10 p-3 backdrop-blur">
-            <p className="opacity-80">Mined</p>
-            <p className="mt-0.5 font-semibold">{fmtNJX(wallet?.total_mined, 2)} NJX</p>
+            <p className="opacity-80">Locked</p>
+            <p className="mt-0.5 font-semibold">{fmtNJX((wallet as any)?.locked_balance ?? 0, 2)}</p>
           </div>
           <div className="rounded-xl bg-white/10 p-3 backdrop-blur">
-            <p className="opacity-80">Referral earnings</p>
-            <p className="mt-0.5 font-semibold">{fmtNJX(wallet?.referral_earnings, 2)} NJX</p>
+            <p className="opacity-80">Mined</p>
+            <p className="mt-0.5 font-semibold">{fmtNJX(wallet?.total_mined, 2)}</p>
+          </div>
+          <div className="rounded-xl bg-white/10 p-3 backdrop-blur">
+            <p className="opacity-80">Referrals</p>
+            <p className="mt-0.5 font-semibold">{fmtNJX(wallet?.referral_earnings, 2)}</p>
           </div>
         </div>
       </motion.div>
