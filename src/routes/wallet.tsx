@@ -253,6 +253,18 @@ function WalletPage() {
   const swapTimeOk = !!unlockDate && unlockDate.getTime() <= Date.now();
   const canSwap = kycApproved && swapTimeOk && locked >= minSwap;
 
+  // Transfer eligibility (mirrors backend transfer_njx gates)
+  const transferTimeOk = swapTimeOk; // same 20-day window from kyc_approved_at
+  const hasAvailable = balance > 0;
+  const canSend = kycApproved && transferTimeOk && hasAvailable;
+  const sendBlockReason = !kycApproved
+    ? "KYC approval required to send credits"
+    : !transferTimeOk
+      ? `Transfers available after ${lockDays} days of KYC approval`
+      : !hasAvailable
+        ? "No available credits. Convert your credits first"
+        : null;
+
   return (
     <div className="space-y-5">
       {/* Balance */}
@@ -309,6 +321,50 @@ function WalletPage() {
           <p className="mt-1 text-xs text-muted-foreground">
             Transfer NJX instantly to another NovaJX user.
           </p>
+
+          <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+            <div className="rounded-xl border border-border/60 bg-background px-3 py-2">
+              <p className="text-muted-foreground">Available Credits</p>
+              <p className="mt-0.5 font-display text-base font-bold">{fmtNJX(balance, 2)}</p>
+            </div>
+            <div className="rounded-xl border border-border/60 bg-background px-3 py-2">
+              <p className="flex items-center gap-1 text-muted-foreground"><Lock className="h-3 w-3" /> Pending Credits</p>
+              <p className="mt-0.5 font-display text-base font-bold">{fmtNJX(locked, 2)}</p>
+            </div>
+          </div>
+
+          <p className="mt-3 rounded-xl bg-muted/60 px-3 py-2 text-[11px] text-muted-foreground">
+            You can send NJX after KYC approval and credit conversion.
+          </p>
+
+          {sendBlockReason && (
+            <div className="mt-3 flex items-start gap-2 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs">
+              <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+              <div className="flex-1">
+                <p className="font-semibold">{sendBlockReason}</p>
+                {!kycApproved && (
+                  <Link to={"/kyc" as any} className="mt-1 inline-block font-semibold text-primary underline">
+                    Verify KYC →
+                  </Link>
+                )}
+                {kycApproved && !transferTimeOk && daysRemaining !== null && (
+                  <p className="mt-0.5 text-muted-foreground">
+                    Unlocks in {daysRemaining} day{daysRemaining === 1 ? "" : "s"} ({unlockDate?.toLocaleDateString()}).
+                  </p>
+                )}
+                {kycApproved && transferTimeOk && !hasAvailable && (
+                  <button
+                    type="button"
+                    onClick={() => setTab("swap")}
+                    className="mt-1 font-semibold text-primary underline"
+                  >
+                    Go to Swap →
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="mt-4 space-y-3">
             <label className="block">
               <span className="mb-1.5 block text-xs font-medium text-muted-foreground">
@@ -323,13 +379,14 @@ function WalletPage() {
                     setLookup(null);
                     setLookupErr(null);
                   }}
+                  disabled={!canSend}
                   className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary"
                   placeholder="user@email.com or NJXABC12"
                 />
                 <button
                   type="button"
                   onClick={lookupUser}
-                  disabled={!recipient.trim()}
+                  disabled={!recipient.trim() || !canSend}
                   className="flex items-center gap-1 rounded-xl border border-border bg-background px-3 text-xs font-semibold transition-smooth hover:bg-accent disabled:opacity-50"
                 >
                   <Search className="h-3.5 w-3.5" /> Find
@@ -352,6 +409,7 @@ function WalletPage() {
                 min="0.01"
                 max={balance}
                 onChange={(e) => setSendAmount(e.target.value)}
+                disabled={!canSend}
                 className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary"
                 placeholder="0.00"
               />
@@ -360,7 +418,7 @@ function WalletPage() {
 
             <button
               onClick={() => sendNjx.mutate()}
-              disabled={sendNjx.isPending || !recipient.trim() || !sendAmount}
+              disabled={!canSend || sendNjx.isPending || !recipient.trim() || !sendAmount}
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-elegant transition-bounce hover:scale-[1.02] disabled:scale-100 disabled:opacity-60"
             >
               {sendNjx.isPending ? (
