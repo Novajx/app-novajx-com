@@ -342,9 +342,6 @@ function WalletPage() {
             Send RNT
           </button>
         </div>
-        <p className="mt-3 rounded-lg bg-muted/60 px-3 py-2 text-[11px] text-muted-foreground">
-          RNT cannot be swapped, converted, or withdrawn. Transfers between users only.
-        </p>
       </div>
 
       {/* Tabs */}
@@ -353,7 +350,7 @@ function WalletPage() {
           { key: "send", label: "Send", icon: Send },
           { key: "swap", label: "Swap", icon: Repeat },
           { key: "rnt", label: "RNT", icon: Gift },
-          { key: "withdraw", label: "Withdraw", icon: ArrowUpRight },
+          { key: "withdraw", label: "Redeem", icon: ArrowUpRight },
           { key: "history", label: "History", icon: Clock },
         ] as const).map((t) => (
           <button
@@ -588,7 +585,7 @@ function WalletPage() {
             <h2 className="font-display text-lg font-bold">Send RNT</h2>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Transfer Referral Reward Tokens to another NovaJX user. RNT cannot be swapped or withdrawn.
+            Transfer Referral Reward Tokens to another NovaJX user.
           </p>
 
           <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
@@ -668,7 +665,7 @@ function WalletPage() {
                 <p className="mt-0.5 text-xs text-muted-foreground">
                   {kyc?.status === "pending"
                     ? "Your KYC is under review."
-                    : "Complete KYC to unlock withdrawals."}
+                    : "Complete KYC to redeem credits."}
                 </p>
                 <Link to={"/kyc" as any} className="mt-2 inline-block text-xs font-semibold text-primary underline">
                   {kyc?.status === "pending" ? "View status →" : "Verify now →"}
@@ -678,8 +675,8 @@ function WalletPage() {
           )}
 
           <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
-            <h2 className="font-display text-lg font-bold">Withdraw NJX</h2>
-            <p className="mt-1 text-xs text-muted-foreground">Min. withdrawal: {min} NJX</p>
+            <h2 className="font-display text-lg font-bold">Redeem Credits</h2>
+            <p className="mt-1 text-xs text-muted-foreground">Min. redeem: {min} NJX · Subject to admin approval</p>
             <div className="mt-4 space-y-3">
               <label className="block">
                 <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Amount (NJX)</span>
@@ -693,9 +690,10 @@ function WalletPage() {
                   className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary disabled:opacity-50"
                   placeholder={`Minimum ${min}`}
                 />
+                <p className="mt-1 text-[11px] text-muted-foreground">Available: {fmtNJX(balance, 2)} NJX (wallet only)</p>
               </label>
               <label className="block">
-                <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Wallet Address</span>
+                <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Redeem Address</span>
                 <input
                   type="text"
                   value={wAddress}
@@ -714,7 +712,7 @@ function WalletPage() {
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   <>
-                    <ArrowUpRight className="h-4 w-4" /> Request Withdrawal
+                    <ArrowUpRight className="h-4 w-4" /> Request Redeem
                   </>
                 )}
               </button>
@@ -771,9 +769,9 @@ function WalletPage() {
           </div>
 
           <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
-            <h2 className="font-display text-lg font-bold">Withdrawals</h2>
+            <h2 className="font-display text-lg font-bold">Redeems</h2>
             {!withdrawals?.length ? (
-              <p className="mt-4 text-center text-sm text-muted-foreground">No withdrawals yet.</p>
+              <p className="mt-4 text-center text-sm text-muted-foreground">No redeems yet.</p>
             ) : (
               <ul className="mt-4 divide-y divide-border/50">
                 {withdrawals.map((w) => {

@@ -1,11 +1,11 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Home, Pickaxe, Users, Wallet, User as UserIcon, Trophy, ShieldCheck } from "lucide-react";
+import { Gift, Users, Wallet, User as UserIcon, Trophy, ShieldCheck } from "lucide-react";
 import logo from "@/assets/novajx-logo.png";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
-  { to: "/dashboard", label: "Mine", icon: Pickaxe },
+  { to: "/dashboard", label: "Collect", icon: Gift },
   { to: "/referrals", label: "Invite", icon: Users },
   { to: "/leaderboard", label: "Top", icon: Trophy },
   { to: "/wallet", label: "Wallet", icon: Wallet },
