@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Pickaxe, Users, Trophy, ShieldCheck, ArrowRight, Sparkles } from "lucide-react";
+import { Gift, Users, Trophy, ShieldCheck, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/novajx-mark.png";
 import { CoinIcon } from "@/components/CoinIcon";
@@ -7,8 +7,8 @@ import { CoinIcon } from "@/components/CoinIcon";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "NovaJX — Mine NJX Coins Daily | Next-Gen Mobile Crypto" },
-      { name: "description", content: "Join NovaJX and mine NJX coins daily. Invite friends and earn 0.5 NJX per friend's mining claim. KYC secure withdrawals." },
+      { title: "NovaJX — Collect Daily Rewards | Earn Digital Credits" },
+      { name: "description", content: "Join NovaJX and collect daily NJX rewards. Invite friends and earn RNT referral tokens. Secure KYC verification." },
     ],
   }),
   component: Landing,
@@ -38,7 +38,7 @@ function Landing() {
         </div>
 
         <h1 className="mx-auto mt-7 max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
-          Mine the future,{" "}
+          Earn digital credits,{" "}
           <span
             className="bg-gradient-gold bg-clip-text"
             style={{ WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}
@@ -48,12 +48,12 @@ function Landing() {
         </h1>
 
         <p className="mx-auto mt-6 max-w-xl text-base text-muted-foreground sm:text-lg">
-          NovaJX (NJX) is the next-gen mobile crypto. No hardware, no electricity, no fees — just one tap a day.
+          NovaJX is a digital rewards platform. Collect 2 NJX every 24 hours — one tap a day, no hardware, no fees.
         </p>
 
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Button asChild size="lg" className="h-12 w-full gap-2 bg-gradient-primary px-8 text-primary-foreground shadow-elegant sm:w-auto">
-            <Link to="/signup" search={{ ref: "" }}>Start mining free <ArrowRight className="h-4 w-4" /></Link>
+            <Link to="/signup" search={{ ref: "" }}>Start collecting free <ArrowRight className="h-4 w-4" /></Link>
           </Button>
           <Button asChild size="lg" variant="ghost" className="h-12 w-full px-8 text-foreground hover:bg-primary/10 sm:w-auto">
             <Link to="/leaderboard">View leaderboard</Link>
@@ -71,9 +71,9 @@ function Landing() {
       <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
         <div className="grid gap-4 sm:gap-5 md:grid-cols-3">
           {[
-            { icon: Pickaxe, title: "One-tap mining", desc: "Claim 2 NJX every 24 hours. No effort, no battery drain." },
-            { icon: Users, title: "Earn from friends", desc: "Get 0.5 NJX bonus every time a referral mines." },
-            { icon: ShieldCheck, title: "KYC secure", desc: "Manual KYC review before withdrawal. Your account, protected." },
+            { icon: Gift, title: "One-tap rewards", desc: "Collect 2 NJX every 24 hours. No effort, no battery drain." },
+            { icon: Users, title: "Invite & earn RNT", desc: "Get 1 RNT for every friend who joins with your code." },
+            { icon: ShieldCheck, title: "KYC secure", desc: "Manual KYC review before redeem. Your account, protected." },
           ].map((f) => (
             <div
               key={f.title}
@@ -91,15 +91,18 @@ function Landing() {
 
       <section className="mx-auto max-w-3xl px-4 pb-24 text-center sm:px-6">
         <Trophy className="mx-auto h-10 w-10 text-gold" />
-        <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Mine. Invite. Climb the ranks.</h2>
-        <p className="mt-3 text-muted-foreground">The earliest miners earn the most. Join now and lock in your rank.</p>
+        <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Collect. Invite. Climb the ranks.</h2>
+        <p className="mt-3 text-muted-foreground">Early collectors earn the most. Join now and lock in your rank.</p>
         <Button asChild size="lg" className="mt-7 h-12 bg-gradient-primary px-8 text-primary-foreground shadow-elegant">
           <Link to="/signup" search={{ ref: "" }}>Create free account</Link>
         </Button>
       </section>
 
       <footer className="border-t border-border/60 py-8 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} NovaJX. Mine smart.
+        <p className="mx-auto max-w-2xl px-4">
+          Novajx is a digital rewards platform. NJX credits are virtual and used داخل the app only.
+        </p>
+        <p className="mt-2">© {new Date().getFullYear()} NovaJX</p>
       </footer>
     </div>
   );
