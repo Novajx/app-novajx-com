@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Users, Copy, Share2, Gift, Loader2, TrendingUp } from "lucide-react";
+import { Users, Copy, Share2, Gift, Loader2 } from "lucide-react";
 import { RequireAuth } from "@/components/RequireAuth";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,12 +29,11 @@ function ReferralsPage() {
   const { data: stats } = useQuery({
     queryKey: ["ref-detail", user?.id],
     queryFn: async () => {
-      const [{ count: total }, { count: active }, { data: bonus }] = await Promise.all([
+      const [{ count: total }, { data: wal }] = await Promise.all([
         supabase.from("referrals").select("*", { count: "exact", head: true }).eq("referrer_id", user!.id),
-        supabase.from("referrals").select("*", { count: "exact", head: true }).eq("referrer_id", user!.id).eq("status", "active"),
-        supabase.from("wallets").select("referral_earnings").eq("user_id", user!.id).maybeSingle(),
+        supabase.from("wallets").select("rnt_balance").eq("user_id", user!.id).maybeSingle(),
       ]);
-      return { total: total ?? 0, active: active ?? 0, earned: Number(bonus?.referral_earnings ?? 0) };
+      return { total: total ?? 0, rnt: Number((wal as any)?.rnt_balance ?? 0) };
     },
     enabled: !!user,
   });
@@ -44,7 +43,7 @@ function ReferralsPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("referrals")
-        .select("id, status, total_bonus_earned, created_at, referred_id")
+        .select("id, status, created_at, referred_id")
         .eq("referrer_id", user!.id)
         .order("created_at", { ascending: false });
       if (!data?.length) return [];
@@ -67,7 +66,7 @@ function ReferralsPage() {
   const shareLink = async () => {
     if (navigator.share) {
       try {
-        await navigator.share({ title: "Join NovaJX", text: `Mine free NJX coins with me. Use my code: ${code}`, url: link });
+        await navigator.share({ title: "Join NovaJX", text: `Join NovaJX and earn digital credits. Use my code: ${code}`, url: link });
       } catch {}
     } else {
       copyLink();
@@ -82,10 +81,10 @@ function ReferralsPage() {
       <div className="rounded-3xl bg-gradient-primary p-7 text-primary-foreground shadow-elegant">
         <div className="flex items-center gap-2">
           <Gift className="h-5 w-5" />
-          <p className="text-sm font-medium opacity-90">Earn 0.5 NJX per friend's mine</p>
+          <p className="text-sm font-medium opacity-90">Earn 1 RNT per successful invite</p>
         </div>
-        <h1 className="mt-2 font-display text-3xl font-bold">Invite & earn forever</h1>
-        <p className="mt-1 text-sm opacity-80">Get a bonus every time your referrals mine NJX.</p>
+        <h1 className="mt-2 font-display text-3xl font-bold">Invite & Earn Rewards</h1>
+        <p className="mt-1 text-sm opacity-80">Share NovaJX with friends and grow your RNT balance.</p>
 
         <div className="mt-5 rounded-2xl bg-white/15 p-3 backdrop-blur">
           <p className="text-xs opacity-80">Your referral code</p>
@@ -97,16 +96,15 @@ function ReferralsPage() {
             <Copy className="h-4 w-4" /> Copy link
           </button>
           <button onClick={shareLink} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-white py-2.5 text-sm font-semibold text-primary transition-smooth hover:bg-white/90">
-            <Share2 className="h-4 w-4" /> Share
+            <Share2 className="h-4 w-4" /> Invite Friends
           </button>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <Stat icon={Users} label="Total" value={stats?.total ?? 0} />
-        <Stat icon={TrendingUp} label="Active" value={stats?.active ?? 0} />
-        <Stat icon={Gift} label="Earned" value={`${fmtNJX(stats?.earned, 2)}`} />
+      <div className="grid grid-cols-2 gap-3">
+        <Stat icon={Users} label="Total Invites" value={stats?.total ?? 0} />
+        <Stat icon={Gift} label="RNT Balance" value={`${fmtNJX(stats?.rnt, 2)}`} />
       </div>
 
       {/* List */}
@@ -127,7 +125,7 @@ function ReferralsPage() {
                     {new Date(r.created_at).toLocaleDateString()} · {r.status}
                   </p>
                 </div>
-                <p className="text-sm font-bold text-primary">+{fmtNJX(r.total_bonus_earned, 2)} NJX</p>
+                <p className="text-sm font-bold text-primary">+1 RNT</p>
               </li>
             ))}
           </ul>
