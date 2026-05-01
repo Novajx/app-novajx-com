@@ -21,7 +21,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <Link to={"/dashboard" as any} className="flex items-center gap-2">
-            <img src={logo} alt="NovaJX" width={32} height={32} className="h-8 w-8" />
+            <img src={logo} alt="NovaJX" width={32} height={32} className="h-8 w-8 object-contain" />
             <span className="font-display text-lg font-bold tracking-tight">NovaJX</span>
           </Link>
           <div className="flex items-center gap-2">

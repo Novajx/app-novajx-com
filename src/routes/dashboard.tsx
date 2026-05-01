@@ -215,7 +215,7 @@ function Dashboard() {
 
       {/* Disclaimer */}
       <p className="rounded-2xl border border-border/60 bg-muted/40 px-4 py-3 text-center text-[11px] text-muted-foreground">
-        Novajx is a digital rewards platform. NJX credits are virtual and used داخل the app only.
+        Novajx is a digital rewards platform. NJX credits are virtual and used inside the app only.
       </p>
     </div>
   );

@@ -32,7 +32,7 @@ function ForgotPage() {
     <div className="flex min-h-screen items-center justify-center bg-gradient-hero px-4">
       <div className="w-full max-w-md">
         <Link to="/" className="mb-8 flex items-center justify-center gap-2">
-          <img src={logo} alt="NovaJX" width={40} height={40} className="h-10 w-10" />
+          <img src={logo} alt="NovaJX" width={40} height={40} className="h-12 w-12 object-contain mx-auto" />
           <span className="font-display text-2xl font-bold">NovaJX</span>
         </Link>
         <div className="rounded-2xl border border-border/60 bg-card p-7 shadow-elegant">

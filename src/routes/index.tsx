@@ -19,7 +19,7 @@ function Landing() {
     <div className="min-h-screen bg-gradient-hero">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
         <Link to="/" className="flex items-center gap-2.5">
-          <img src={logo} alt="NovaJX" width={36} height={36} className="h-9 w-9 rounded-lg" />
+          <img src={logo} alt="NovaJX" width={36} height={36} className="h-9 w-9 object-contain" />
           <span className="font-display text-lg font-bold tracking-tight sm:text-xl">NovaJX</span>
         </Link>
         <div className="flex items-center gap-1.5 sm:gap-2">
@@ -73,7 +73,7 @@ function Landing() {
           {[
             { icon: Gift, title: "One-tap rewards", desc: "Collect 2 NJX every 24 hours. No effort, no battery drain." },
             { icon: Users, title: "Invite & earn RNT", desc: "Get 1 RNT for every friend who joins with your code." },
-            { icon: ShieldCheck, title: "KYC secure", desc: "Manual KYC review before redeem. Your account, protected." },
+            { icon: ShieldCheck, title: "KYC secure", desc: "Manual KYC review for verified accounts. Your account, protected." },
           ].map((f) => (
             <div
               key={f.title}
@@ -100,7 +100,7 @@ function Landing() {
 
       <footer className="border-t border-border/60 py-8 text-center text-xs text-muted-foreground">
         <p className="mx-auto max-w-2xl px-4">
-          Novajx is a digital rewards platform. NJX credits are virtual and used داخل the app only.
+          Novajx is a digital rewards platform. NJX credits are virtual and used inside the app only.
         </p>
         <p className="mt-2">© {new Date().getFullYear()} NovaJX</p>
       </footer>

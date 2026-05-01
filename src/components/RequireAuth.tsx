@@ -1,10 +1,13 @@
 import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
-import { Loader2 } from "lucide-react";
+import { Loader2, ShieldAlert } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 
 export function RequireAuth({ children, requireAdmin = false }: { children: React.ReactNode; requireAdmin?: boolean }) {
-  const { user, loading, isAdmin } = useAuth();
+  const { user, loading, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,6 +22,20 @@ export function RequireAuth({ children, requireAdmin = false }: { children: Reac
     }
   }, [user, isAdmin, requireAdmin, loading, navigate]);
 
+  const { data: profile, isLoading: profileLoading } = useQuery({
+    queryKey: ["banned-check", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("banned")
+        .eq("id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!user,
+    refetchOnWindowFocus: true,
+  });
+
   if (loading || !user || (requireAdmin && !isAdmin)) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -26,5 +43,33 @@ export function RequireAuth({ children, requireAdmin = false }: { children: Reac
       </div>
     );
   }
+
+  if (!isAdmin && profile?.banned) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="max-w-md rounded-3xl border border-destructive/30 bg-card p-8 text-center shadow-elegant">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
+            <ShieldAlert className="h-7 w-7 text-destructive" />
+          </div>
+          <h1 className="mt-4 font-display text-2xl font-bold">Account suspended</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Your account has been suspended. Contact support.
+          </p>
+          <Button onClick={() => signOut()} variant="outline" className="mt-6 w-full">
+            Sign out
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (profileLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return <>{children}</>;
 }

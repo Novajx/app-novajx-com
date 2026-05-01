@@ -9,9 +9,7 @@ import {
   Send,
   Loader2,
   ShieldAlert,
-  CheckCircle2,
   Clock,
-  XCircle,
   Search,
   Lock,
   Repeat,
@@ -34,7 +32,7 @@ export const Route = createFileRoute("/wallet")({
   head: () => ({ meta: [{ title: "Wallet — NovaJX" }] }),
 });
 
-type Tab = "send" | "swap" | "rnt" | "withdraw" | "history";
+type Tab = "send" | "swap" | "rnt" | "history";
 
 function WalletPage() {
   const { user } = useAuth();
@@ -50,10 +48,6 @@ function WalletPage() {
   // RNT transfer state
   const [rntRecipient, setRntRecipient] = useState("");
   const [rntAmount, setRntAmount] = useState("");
-
-  // Withdraw state
-  const [wAmount, setWAmount] = useState("");
-  const [wAddress, setWAddress] = useState("");
 
   // Swap state
   const [swapAmount, setSwapAmount] = useState("");
@@ -109,20 +103,6 @@ function WalletPage() {
     },
   });
 
-  const { data: withdrawals } = useQuery({
-    queryKey: ["withdrawals", user?.id],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("withdrawal_requests")
-        .select("*")
-        .eq("user_id", user!.id)
-        .order("created_at", { ascending: false })
-        .limit(20);
-      return data ?? [];
-    },
-    enabled: !!user,
-  });
-
   const { data: txs } = useQuery({
     queryKey: ["transactions", user?.id],
     queryFn: async () => {
@@ -153,14 +133,6 @@ function WalletPage() {
       return map;
     },
     enabled: counterpartyIds.length > 0,
-  });
-
-  const { data: minWithdrawal } = useQuery({
-    queryKey: ["min-withdrawal"],
-    queryFn: async () => {
-      const { data } = await supabase.from("app_settings").select("value").eq("key", "min_withdrawal").maybeSingle();
-      return Number(data?.value ?? 40);
-    },
   });
 
   const lookupUser = async () => {
@@ -198,23 +170,6 @@ function WalletPage() {
       setRecipient("");
       setSendAmount("");
       setLookup(null);
-      qc.invalidateQueries();
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
-  const withdraw = useMutation({
-    mutationFn: async () => {
-      const amt = Number(wAmount);
-      if (!amt || amt <= 0) throw new Error("Enter a valid amount");
-      if (!wAddress || wAddress.trim().length < 6) throw new Error("Enter a valid wallet address");
-      const { error } = await supabase.rpc("request_withdrawal", { _amount: amt, _wallet_address: wAddress.trim() });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Withdrawal requested!", { description: "Pending admin review." });
-      setWAmount("");
-      setWAddress("");
       qc.invalidateQueries();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -264,7 +219,6 @@ function WalletPage() {
     );
 
   const kycApproved = kyc?.status === "approved";
-  const min = minWithdrawal ?? 40;
   const balance = Number(wallet?.balance ?? 0);
   const locked = Number((wallet as any)?.locked_balance ?? 0);
   const rnt = Number((wallet as any)?.rnt_balance ?? 0);
@@ -331,7 +285,7 @@ function WalletPage() {
             </p>
             <p className="mt-0.5 text-xs text-muted-foreground">Referral Reward Token</p>
             <p className="mt-2 inline-block rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary">
-              1 RNT = 5 NJX (display value only)
+              1 RNT = 5 NJX
             </p>
           </div>
           <button
@@ -345,12 +299,11 @@ function WalletPage() {
       </div>
 
       {/* Tabs */}
-      <div className="grid grid-cols-5 gap-1 rounded-2xl border border-border/60 bg-card p-1">
+      <div className="grid grid-cols-4 gap-1 rounded-2xl border border-border/60 bg-card p-1">
         {([
           { key: "send", label: "Send", icon: Send },
           { key: "swap", label: "Swap", icon: Repeat },
           { key: "rnt", label: "RNT", icon: Gift },
-          { key: "withdraw", label: "Redeem", icon: ArrowUpRight },
           { key: "history", label: "History", icon: Clock },
         ] as const).map((t) => (
           <button
@@ -654,73 +607,6 @@ function WalletPage() {
         </div>
       )}
 
-      {/* WITHDRAW TAB */}
-      {tab === "withdraw" && (
-        <>
-          {!kycApproved && (
-            <div className="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
-              <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
-              <div className="flex-1">
-                <p className="font-semibold">KYC verification required</p>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  {kyc?.status === "pending"
-                    ? "Your KYC is under review."
-                    : "Complete KYC to redeem credits."}
-                </p>
-                <Link to={"/kyc" as any} className="mt-2 inline-block text-xs font-semibold text-primary underline">
-                  {kyc?.status === "pending" ? "View status →" : "Verify now →"}
-                </Link>
-              </div>
-            </div>
-          )}
-
-          <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
-            <h2 className="font-display text-lg font-bold">Redeem Credits</h2>
-            <p className="mt-1 text-xs text-muted-foreground">Min. redeem: {min} NJX · Subject to admin approval</p>
-            <div className="mt-4 space-y-3">
-              <label className="block">
-                <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Amount (NJX)</span>
-                <input
-                  type="number"
-                  value={wAmount}
-                  min={min}
-                  max={balance}
-                  onChange={(e) => setWAmount(e.target.value)}
-                  disabled={!kycApproved}
-                  className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary disabled:opacity-50"
-                  placeholder={`Minimum ${min}`}
-                />
-                <p className="mt-1 text-[11px] text-muted-foreground">Available: {fmtNJX(balance, 2)} NJX (wallet only)</p>
-              </label>
-              <label className="block">
-                <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Redeem Address</span>
-                <input
-                  type="text"
-                  value={wAddress}
-                  onChange={(e) => setWAddress(e.target.value)}
-                  disabled={!kycApproved}
-                  className="w-full rounded-xl border border-border bg-background px-4 py-2.5 font-mono text-sm outline-none focus:border-primary disabled:opacity-50"
-                  placeholder="0x..."
-                />
-              </label>
-              <button
-                onClick={() => withdraw.mutate()}
-                disabled={!kycApproved || withdraw.isPending}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-elegant transition-bounce hover:scale-[1.02] disabled:scale-100 disabled:opacity-60"
-              >
-                {withdraw.isPending ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <>
-                    <ArrowUpRight className="h-4 w-4" /> Request Redeem
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-
       {/* HISTORY TAB */}
       {tab === "history" && (
         <div className="space-y-5">
@@ -761,37 +647,6 @@ function WalletPage() {
                         {isSent ? "-" : "+"}
                         {fmtNJX(t.amount, 2)} {unit}
                       </p>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
-
-          <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
-            <h2 className="font-display text-lg font-bold">Redeems</h2>
-            {!withdrawals?.length ? (
-              <p className="mt-4 text-center text-sm text-muted-foreground">No redeems yet.</p>
-            ) : (
-              <ul className="mt-4 divide-y divide-border/50">
-                {withdrawals.map((w) => {
-                  const status = {
-                    pending: { Icon: Clock, color: "text-amber-500", label: "Pending" },
-                    approved: { Icon: Clock, color: "text-blue-500", label: "Approved" },
-                    paid: { Icon: CheckCircle2, color: "text-emerald-500", label: "Paid" },
-                    rejected: { Icon: XCircle, color: "text-red-500", label: "Rejected" },
-                  }[w.status];
-                  return (
-                    <li key={w.id} className="flex items-center justify-between py-3">
-                      <div>
-                        <p className="font-semibold">{fmtNJX(w.amount, 2)} NJX</p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(w.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className={`flex items-center gap-1.5 text-xs font-medium ${status.color}`}>
-                        <status.Icon className="h-3.5 w-3.5" /> {status.label}
-                      </div>
                     </li>
                   );
                 })}
