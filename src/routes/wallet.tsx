@@ -9,9 +9,7 @@ import {
   Send,
   Loader2,
   ShieldAlert,
-  CheckCircle2,
   Clock,
-  XCircle,
   Search,
   Lock,
   Repeat,
@@ -50,10 +48,6 @@ function WalletPage() {
   // RNT transfer state
   const [rntRecipient, setRntRecipient] = useState("");
   const [rntAmount, setRntAmount] = useState("");
-
-  // Withdraw state
-  const [wAmount, setWAmount] = useState("");
-  const [wAddress, setWAddress] = useState("");
 
   // Swap state
   const [swapAmount, setSwapAmount] = useState("");
@@ -109,20 +103,6 @@ function WalletPage() {
     },
   });
 
-  const { data: withdrawals } = useQuery({
-    queryKey: ["withdrawals", user?.id],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("withdrawal_requests")
-        .select("*")
-        .eq("user_id", user!.id)
-        .order("created_at", { ascending: false })
-        .limit(20);
-      return data ?? [];
-    },
-    enabled: !!user,
-  });
-
   const { data: txs } = useQuery({
     queryKey: ["transactions", user?.id],
     queryFn: async () => {
@@ -153,14 +133,6 @@ function WalletPage() {
       return map;
     },
     enabled: counterpartyIds.length > 0,
-  });
-
-  const { data: minWithdrawal } = useQuery({
-    queryKey: ["min-withdrawal"],
-    queryFn: async () => {
-      const { data } = await supabase.from("app_settings").select("value").eq("key", "min_withdrawal").maybeSingle();
-      return Number(data?.value ?? 40);
-    },
   });
 
   const lookupUser = async () => {
@@ -198,23 +170,6 @@ function WalletPage() {
       setRecipient("");
       setSendAmount("");
       setLookup(null);
-      qc.invalidateQueries();
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
-  const withdraw = useMutation({
-    mutationFn: async () => {
-      const amt = Number(wAmount);
-      if (!amt || amt <= 0) throw new Error("Enter a valid amount");
-      if (!wAddress || wAddress.trim().length < 6) throw new Error("Enter a valid wallet address");
-      const { error } = await supabase.rpc("request_withdrawal", { _amount: amt, _wallet_address: wAddress.trim() });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Withdrawal requested!", { description: "Pending admin review." });
-      setWAmount("");
-      setWAddress("");
       qc.invalidateQueries();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -264,7 +219,6 @@ function WalletPage() {
     );
 
   const kycApproved = kyc?.status === "approved";
-  const min = minWithdrawal ?? 40;
   const balance = Number(wallet?.balance ?? 0);
   const locked = Number((wallet as any)?.locked_balance ?? 0);
   const rnt = Number((wallet as any)?.rnt_balance ?? 0);
