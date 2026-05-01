@@ -49,9 +49,19 @@ function SignInPage() {
 
   const onSubmit = async (data: FormData) => {
     setSubmitting(true);
-    const { error } = await supabase.auth.signInWithPassword(data);
+    const { data: signInData, error } = await supabase.auth.signInWithPassword(data);
     setSubmitting(false);
     if (error) { toast.error(error.message); return; }
+    // Block banned users at the door
+    const uid = signInData.user?.id;
+    if (uid) {
+      const { data: prof } = await supabase.from("profiles").select("banned").eq("id", uid).maybeSingle();
+      if (prof?.banned) {
+        await supabase.auth.signOut();
+        toast.error("Your account has been suspended. Contact support.");
+        return;
+      }
+    }
     toast.success("Welcome back!");
     window.location.href = redirect;
   };
