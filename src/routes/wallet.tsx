@@ -331,7 +331,7 @@ function WalletPage() {
             </p>
             <p className="mt-0.5 text-xs text-muted-foreground">Referral Reward Token</p>
             <p className="mt-2 inline-block rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary">
-              1 RNT = 5 NJX (display value only)
+              1 RNT = 5 NJX
             </p>
           </div>
           <button
@@ -345,12 +345,11 @@ function WalletPage() {
       </div>
 
       {/* Tabs */}
-      <div className="grid grid-cols-5 gap-1 rounded-2xl border border-border/60 bg-card p-1">
+      <div className="grid grid-cols-4 gap-1 rounded-2xl border border-border/60 bg-card p-1">
         {([
           { key: "send", label: "Send", icon: Send },
           { key: "swap", label: "Swap", icon: Repeat },
           { key: "rnt", label: "RNT", icon: Gift },
-          { key: "withdraw", label: "Redeem", icon: ArrowUpRight },
           { key: "history", label: "History", icon: Clock },
         ] as const).map((t) => (
           <button
