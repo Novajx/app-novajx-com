@@ -34,7 +34,7 @@ export const Route = createFileRoute("/wallet")({
   head: () => ({ meta: [{ title: "Wallet — NovaJX" }] }),
 });
 
-type Tab = "send" | "swap" | "rnt" | "withdraw" | "history";
+type Tab = "send" | "swap" | "rnt" | "history";
 
 function WalletPage() {
   const { user } = useAuth();
@@ -653,73 +653,6 @@ function WalletPage() {
         </div>
       )}
 
-      {/* WITHDRAW TAB */}
-      {tab === "withdraw" && (
-        <>
-          {!kycApproved && (
-            <div className="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
-              <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
-              <div className="flex-1">
-                <p className="font-semibold">KYC verification required</p>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  {kyc?.status === "pending"
-                    ? "Your KYC is under review."
-                    : "Complete KYC to redeem credits."}
-                </p>
-                <Link to={"/kyc" as any} className="mt-2 inline-block text-xs font-semibold text-primary underline">
-                  {kyc?.status === "pending" ? "View status →" : "Verify now →"}
-                </Link>
-              </div>
-            </div>
-          )}
-
-          <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
-            <h2 className="font-display text-lg font-bold">Redeem Credits</h2>
-            <p className="mt-1 text-xs text-muted-foreground">Min. redeem: {min} NJX · Subject to admin approval</p>
-            <div className="mt-4 space-y-3">
-              <label className="block">
-                <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Amount (NJX)</span>
-                <input
-                  type="number"
-                  value={wAmount}
-                  min={min}
-                  max={balance}
-                  onChange={(e) => setWAmount(e.target.value)}
-                  disabled={!kycApproved}
-                  className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary disabled:opacity-50"
-                  placeholder={`Minimum ${min}`}
-                />
-                <p className="mt-1 text-[11px] text-muted-foreground">Available: {fmtNJX(balance, 2)} NJX (wallet only)</p>
-              </label>
-              <label className="block">
-                <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Redeem Address</span>
-                <input
-                  type="text"
-                  value={wAddress}
-                  onChange={(e) => setWAddress(e.target.value)}
-                  disabled={!kycApproved}
-                  className="w-full rounded-xl border border-border bg-background px-4 py-2.5 font-mono text-sm outline-none focus:border-primary disabled:opacity-50"
-                  placeholder="0x..."
-                />
-              </label>
-              <button
-                onClick={() => withdraw.mutate()}
-                disabled={!kycApproved || withdraw.isPending}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-elegant transition-bounce hover:scale-[1.02] disabled:scale-100 disabled:opacity-60"
-              >
-                {withdraw.isPending ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <>
-                    <ArrowUpRight className="h-4 w-4" /> Request Redeem
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-
       {/* HISTORY TAB */}
       {tab === "history" && (
         <div className="space-y-5">
@@ -760,37 +693,6 @@ function WalletPage() {
                         {isSent ? "-" : "+"}
                         {fmtNJX(t.amount, 2)} {unit}
                       </p>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
-
-          <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
-            <h2 className="font-display text-lg font-bold">Redeems</h2>
-            {!withdrawals?.length ? (
-              <p className="mt-4 text-center text-sm text-muted-foreground">No redeems yet.</p>
-            ) : (
-              <ul className="mt-4 divide-y divide-border/50">
-                {withdrawals.map((w) => {
-                  const status = {
-                    pending: { Icon: Clock, color: "text-amber-500", label: "Pending" },
-                    approved: { Icon: Clock, color: "text-blue-500", label: "Approved" },
-                    paid: { Icon: CheckCircle2, color: "text-emerald-500", label: "Paid" },
-                    rejected: { Icon: XCircle, color: "text-red-500", label: "Rejected" },
-                  }[w.status];
-                  return (
-                    <li key={w.id} className="flex items-center justify-between py-3">
-                      <div>
-                        <p className="font-semibold">{fmtNJX(w.amount, 2)} NJX</p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(w.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className={`flex items-center gap-1.5 text-xs font-medium ${status.color}`}>
-                        <status.Icon className="h-3.5 w-3.5" /> {status.label}
-                      </div>
                     </li>
                   );
                 })}
