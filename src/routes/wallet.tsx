@@ -366,12 +366,7 @@ function WalletPage() {
                     Verify KYC →
                   </Link>
                 )}
-                {kycApproved && !transferTimeOk && daysRemaining !== null && (
-                  <p className="mt-0.5 text-muted-foreground">
-                    Unlocks in {daysRemaining} day{daysRemaining === 1 ? "" : "s"} ({unlockDate?.toLocaleDateString()}).
-                  </p>
-                )}
-                {kycApproved && transferTimeOk && !hasAvailable && (
+                {kycApproved && !hasAvailable && (
                   <button
                     type="button"
                     onClick={() => setTab("swap")}
