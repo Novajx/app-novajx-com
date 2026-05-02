@@ -14,6 +14,8 @@ import {
   Lock,
   Repeat,
   Gift,
+  Copy,
+  Check,
 } from "lucide-react";
 import { RequireAuth } from "@/components/RequireAuth";
 import { AppShell } from "@/components/AppShell";
@@ -38,6 +40,7 @@ function WalletPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("send");
+  const [copied, setCopied] = useState(false);
 
   // Send NJX state
   const [recipient, setRecipient] = useState("");
@@ -273,6 +276,37 @@ function WalletPage() {
       </div>
 
       {/* RNT Balance */}
+      {/* Wallet Address */}
+      {(wallet as any)?.wallet_address && (
+        <div className="rounded-3xl border border-border/60 bg-card p-5 shadow-soft">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <WalletIcon className="h-3.5 w-3.5 text-primary" />
+            <span className="font-semibold uppercase tracking-wider">Your Wallet Address</span>
+          </div>
+          <div className="mt-2 flex items-center gap-2">
+            <code className="flex-1 truncate rounded-xl bg-muted px-3 py-2.5 font-mono text-sm font-semibold tracking-wide">
+              {(wallet as any).wallet_address}
+            </code>
+            <button
+              type="button"
+              onClick={async () => {
+                await navigator.clipboard.writeText((wallet as any).wallet_address);
+                setCopied(true);
+                toast.success("Wallet address copied");
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              className="flex shrink-0 items-center gap-1.5 rounded-xl border border-border bg-background px-3 py-2.5 text-xs font-semibold transition-smooth hover:border-primary"
+            >
+              {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
+              {copied ? "Copied" : "Copy"}
+            </button>
+          </div>
+          <p className="mt-2 text-[11px] text-muted-foreground">
+            Share this address to receive NJX or RNT from other users.
+          </p>
+        </div>
+      )}
+
       <div className="rounded-3xl border border-border/60 bg-card p-5 shadow-soft">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -375,7 +409,7 @@ function WalletPage() {
           <div className="mt-4 space-y-3">
             <label className="block">
               <span className="mb-1.5 block text-xs font-medium text-muted-foreground">
-                Recipient (Email or Referral Code)
+                Recipient (Wallet Address, Email, or Referral Code)
               </span>
               <div className="flex gap-2">
                 <input
@@ -388,7 +422,7 @@ function WalletPage() {
                   }}
                   disabled={!canSend}
                   className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary"
-                  placeholder="user@email.com or NJXABC12"
+                  placeholder="NJX-XXXXXXXX, email, or NJXABC12"
                 />
                 <button
                   type="button"
@@ -556,7 +590,7 @@ function WalletPage() {
           <div className="mt-4 space-y-3">
             <label className="block">
               <span className="mb-1.5 block text-xs font-medium text-muted-foreground">
-                Recipient (Email or Referral Code)
+                Recipient (Wallet Address, Email, or Referral Code)
               </span>
               <input
                 type="text"
@@ -564,7 +598,7 @@ function WalletPage() {
                 onChange={(e) => setRntRecipient(e.target.value)}
                 disabled={rnt <= 0}
                 className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary disabled:opacity-50"
-                placeholder="user@email.com or NJXABC12"
+                placeholder="NJX-XXXXXXXX, email, or NJXABC12"
               />
             </label>
 
