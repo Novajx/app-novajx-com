@@ -409,7 +409,7 @@ function WalletPage() {
           <div className="mt-4 space-y-3">
             <label className="block">
               <span className="mb-1.5 block text-xs font-medium text-muted-foreground">
-                Recipient (Email or Referral Code)
+                Recipient (Wallet Address, Email, or Referral Code)
               </span>
               <div className="flex gap-2">
                 <input
@@ -422,7 +422,7 @@ function WalletPage() {
                   }}
                   disabled={!canSend}
                   className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary"
-                  placeholder="user@email.com or NJXABC12"
+                  placeholder="NJX-XXXXXXXX, email, or NJXABC12"
                 />
                 <button
                   type="button"
@@ -590,7 +590,7 @@ function WalletPage() {
           <div className="mt-4 space-y-3">
             <label className="block">
               <span className="mb-1.5 block text-xs font-medium text-muted-foreground">
-                Recipient (Email or Referral Code)
+                Recipient (Wallet Address, Email, or Referral Code)
               </span>
               <input
                 type="text"
@@ -598,7 +598,7 @@ function WalletPage() {
                 onChange={(e) => setRntRecipient(e.target.value)}
                 disabled={rnt <= 0}
                 className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary disabled:opacity-50"
-                placeholder="user@email.com or NJXABC12"
+                placeholder="NJX-XXXXXXXX, email, or NJXABC12"
               />
             </label>
 
