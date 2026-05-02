@@ -93,18 +93,7 @@ function WalletPage() {
     enabled: !!user,
   });
 
-  const { data: swapSettings } = useQuery({
-    queryKey: ["swap-settings"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("app_settings")
-        .select("key,value")
-        .in("key", ["min_swap", "swap_lock_days"]);
-      const map: Record<string, number> = {};
-      (data ?? []).forEach((r: any) => (map[r.key] = Number(r.value)));
-      return { minSwap: map.min_swap ?? 50, lockDays: map.swap_lock_days ?? 20 };
-    },
-  });
+  // Swap restrictions removed: no minimum, no waiting period after KYC.
 
   const { data: txs } = useQuery({
     queryKey: ["transactions", user?.id],
@@ -226,28 +215,17 @@ function WalletPage() {
   const locked = Number((wallet as any)?.locked_balance ?? 0);
   const rnt = Number((wallet as any)?.rnt_balance ?? 0);
 
-  // Swap eligibility
-  const minSwap = swapSettings?.minSwap ?? 50;
-  const lockDays = swapSettings?.lockDays ?? 20;
-  const approvedAt = profile?.kyc_approved_at ? new Date(profile.kyc_approved_at) : null;
-  const unlockDate = approvedAt ? new Date(approvedAt.getTime() + lockDays * 86400000) : null;
-  const daysRemaining = unlockDate
-    ? Math.max(0, Math.ceil((unlockDate.getTime() - Date.now()) / 86400000))
-    : null;
-  const swapTimeOk = !!unlockDate && unlockDate.getTime() <= Date.now();
-  const canSwap = kycApproved && swapTimeOk && locked >= minSwap;
+  // Swap eligibility: KYC-approved users can swap any positive amount immediately
+  const canSwap = kycApproved && locked > 0;
 
   // Transfer eligibility (mirrors backend transfer_njx gates)
-  const transferTimeOk = swapTimeOk; // same 20-day window from kyc_approved_at
   const hasAvailable = balance > 0;
-  const canSend = kycApproved && transferTimeOk && hasAvailable;
+  const canSend = kycApproved && hasAvailable;
   const sendBlockReason = !kycApproved
     ? "KYC approval required to send credits"
-    : !transferTimeOk
-      ? `Transfers available after ${lockDays} days of KYC approval`
-      : !hasAvailable
-        ? "No available credits. Convert your credits first"
-        : null;
+    : !hasAvailable
+      ? "No available credits. Convert your credits first"
+      : null;
 
   return (
     <div className="space-y-5">
