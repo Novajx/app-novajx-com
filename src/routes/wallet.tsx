@@ -470,7 +470,7 @@ function WalletPage() {
           <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
             <h2 className="font-display text-lg font-bold">Swap Locked → Wallet</h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              Move your mined coins into your spendable wallet. Min {minSwap} NJX. Available {lockDays} days after KYC approval.
+              Move your mined coins into your spendable wallet. Available immediately after KYC approval.
             </p>
 
             {!kycApproved && (
@@ -488,31 +488,19 @@ function WalletPage() {
               </div>
             )}
 
-            {kycApproved && !swapTimeOk && (
-              <div className="mt-4 flex items-start gap-3 rounded-2xl border border-blue-500/30 bg-blue-500/10 p-4 text-sm">
-                <Clock className="mt-0.5 h-5 w-5 shrink-0 text-blue-500" />
-                <div className="flex-1">
-                  <p className="font-semibold">Swap available in {daysRemaining} day{daysRemaining === 1 ? "" : "s"}</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    Unlocks on {unlockDate?.toLocaleDateString()}.
-                  </p>
-                </div>
-              </div>
-            )}
-
             <div className="mt-4 space-y-3">
               <label className="block">
                 <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Amount (NJX)</span>
                 <input
                   type="number"
                   value={swapAmount}
-                  min={minSwap}
+                  min={0}
                   max={locked}
                   step="0.01"
                   onChange={(e) => setSwapAmount(e.target.value)}
                   disabled={!canSwap}
                   className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary disabled:opacity-50"
-                  placeholder={`Minimum ${minSwap}`}
+                  placeholder="Enter amount"
                 />
                 <p className="mt-1 text-[11px] text-muted-foreground">
                   Locked: {fmtNJX(locked, 2)} NJX
