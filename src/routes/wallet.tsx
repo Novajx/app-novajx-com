@@ -296,9 +296,7 @@ function WalletPage() {
               {fmtNJX(rnt, 2)} <span className="text-base text-muted-foreground">RNT</span>
             </p>
             <p className="mt-0.5 text-xs text-muted-foreground">Referral Reward Token</p>
-            <p className="mt-2 inline-block rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary">
-              1 RNT = 5 NJX
-            </p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">Earned from successful referrals</p>
           </div>
           <button
             type="button"
@@ -536,16 +534,9 @@ function WalletPage() {
             Transfer Referral Reward Tokens to another NovaJX user.
           </p>
 
-          <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-            <div className="rounded-xl border border-border/60 bg-background px-3 py-2">
-              <p className="text-muted-foreground">RNT Balance</p>
-              <p className="mt-0.5 font-display text-base font-bold">{fmtNJX(rnt, 2)}</p>
-            </div>
-            <div className="rounded-xl border border-border/60 bg-background px-3 py-2">
-              <p className="text-muted-foreground">Display Value</p>
-              <p className="mt-0.5 font-display text-base font-bold">{fmtNJX(rnt * 5, 2)} NJX</p>
-              <p className="text-[10px] text-muted-foreground">1 RNT = 5 NJX (display only)</p>
-            </div>
+          <div className="mt-3 rounded-xl border border-border/60 bg-background px-3 py-2 text-xs">
+            <p className="text-muted-foreground">RNT Balance</p>
+            <p className="mt-0.5 font-display text-base font-bold">{fmtNJX(rnt, 2)} RNT</p>
           </div>
 
           <div className="mt-4 space-y-3">

@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action_type: string
+          admin_id: string
+          affected_user: string | null
+          created_at: string
+          details: Json | null
+          id: string
+        }
+        Insert: {
+          action_type: string
+          admin_id: string
+          affected_user?: string | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+        }
+        Update: {
+          action_type?: string
+          admin_id?: string
+          affected_user?: string | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           key: string
@@ -34,6 +61,7 @@ export type Database = {
       }
       kyc_submissions: {
         Row: {
+          cnic_hash: string | null
           country: string
           dob: string
           full_name: string
@@ -50,6 +78,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          cnic_hash?: string | null
           country: string
           dob: string
           full_name: string
@@ -66,6 +95,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          cnic_hash?: string | null
           country?: string
           dob?: string
           full_name?: string
@@ -116,36 +146,45 @@ export type Database = {
       profiles: {
         Row: {
           banned: boolean
+          cnic_hash: string | null
           country: string | null
           created_at: string
+          device_id: string | null
           email: string | null
           full_name: string
           id: string
           kyc_approved_at: string | null
+          last_login_ip: string | null
           phone: string | null
           referral_code: string
           referred_by: string | null
         }
         Insert: {
           banned?: boolean
+          cnic_hash?: string | null
           country?: string | null
           created_at?: string
+          device_id?: string | null
           email?: string | null
           full_name?: string
           id: string
           kyc_approved_at?: string | null
+          last_login_ip?: string | null
           phone?: string | null
           referral_code: string
           referred_by?: string | null
         }
         Update: {
           banned?: boolean
+          cnic_hash?: string | null
           country?: string | null
           created_at?: string
+          device_id?: string | null
           email?: string | null
           full_name?: string
           id?: string
           kyc_approved_at?: string | null
+          last_login_ip?: string | null
           phone?: string | null
           referral_code?: string
           referred_by?: string | null
@@ -166,6 +205,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      rate_limits: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       referral_bonuses: {
         Row: {
@@ -237,6 +297,7 @@ export type Database = {
           amount: number
           created_at: string
           id: string
+          idempotency_key: string | null
           note: string | null
           receiver_id: string
           sender_id: string
@@ -247,6 +308,7 @@ export type Database = {
           amount: number
           created_at?: string
           id?: string
+          idempotency_key?: string | null
           note?: string | null
           receiver_id: string
           sender_id: string
@@ -257,6 +319,7 @@ export type Database = {
           amount?: number
           created_at?: string
           id?: string
+          idempotency_key?: string | null
           note?: string | null
           receiver_id?: string
           sender_id?: string
@@ -398,6 +461,14 @@ export type Database = {
         Args: { _action: string; _kyc_id: string; _reason?: string }
         Returns: undefined
       }
+      admin_set_banned: {
+        Args: { _banned: boolean; _user_id: string }
+        Returns: undefined
+      }
+      check_rate_limit: {
+        Args: { _action: string; _max: number; _window: string }
+        Returns: undefined
+      }
       claim_mining: { Args: never; Returns: Json }
       find_user_for_transfer: {
         Args: { _query: string }
@@ -421,14 +492,34 @@ export type Database = {
         Returns: Json
       }
       swap_njx: { Args: { _amount: number }; Returns: Json }
-      transfer_njx: {
-        Args: { _amount: number; _note?: string; _recipient: string }
-        Returns: Json
-      }
-      transfer_rnt: {
-        Args: { _amount: number; _note?: string; _recipient: string }
-        Returns: Json
-      }
+      transfer_njx:
+        | {
+            Args: { _amount: number; _note?: string; _recipient: string }
+            Returns: Json
+          }
+        | {
+            Args: {
+              _amount: number
+              _idempotency_key?: string
+              _note?: string
+              _recipient: string
+            }
+            Returns: Json
+          }
+      transfer_rnt:
+        | {
+            Args: { _amount: number; _note?: string; _recipient: string }
+            Returns: Json
+          }
+        | {
+            Args: {
+              _amount: number
+              _idempotency_key?: string
+              _note?: string
+              _recipient: string
+            }
+            Returns: Json
+          }
     }
     Enums: {
       app_role: "admin" | "user"
