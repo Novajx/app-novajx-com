@@ -296,9 +296,7 @@ function WalletPage() {
               {fmtNJX(rnt, 2)} <span className="text-base text-muted-foreground">RNT</span>
             </p>
             <p className="mt-0.5 text-xs text-muted-foreground">Referral Reward Token</p>
-            <p className="mt-2 inline-block rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary">
-              1 RNT = 5 NJX
-            </p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">Earned from successful referrals</p>
           </div>
           <button
             type="button"
