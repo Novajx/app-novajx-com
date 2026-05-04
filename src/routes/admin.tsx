@@ -137,7 +137,7 @@ function UsersTab() {
 
   const toggleBan = useMutation({
     mutationFn: async ({ id, banned }: { id: string; banned: boolean }) => {
-      const { error } = await supabase.from("profiles").update({ banned }).eq("id", id);
+      const { error } = await supabase.rpc("admin_set_banned", { _user_id: id, _banned: banned });
       if (error) throw error;
     },
     onSuccess: (_, v) => {
