@@ -6,8 +6,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 
-export function RequireAuth({ children, requireAdmin = false }: { children: React.ReactNode; requireAdmin?: boolean }) {
-  const { user, loading, isAdmin, signOut } = useAuth();
+export function RequireAuth({ children, requireAdmin = false, requireStaff = false }: { children: React.ReactNode; requireAdmin?: boolean; requireStaff?: boolean }) {
+  const { user, loading, isAdmin, isStaff, signOut } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,7 +20,10 @@ export function RequireAuth({ children, requireAdmin = false }: { children: Reac
     if (!loading && user && requireAdmin && !isAdmin) {
       navigate({ to: "/dashboard" as any });
     }
-  }, [user, isAdmin, requireAdmin, loading, navigate]);
+    if (!loading && user && requireStaff && !isStaff) {
+      navigate({ to: "/dashboard" as any });
+    }
+  }, [user, isAdmin, isStaff, requireAdmin, requireStaff, loading, navigate]);
 
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["banned-check", user?.id],
@@ -36,7 +39,7 @@ export function RequireAuth({ children, requireAdmin = false }: { children: Reac
     refetchOnWindowFocus: true,
   });
 
-  if (loading || !user || (requireAdmin && !isAdmin)) {
+  if (loading || !user || (requireAdmin && !isAdmin) || (requireStaff && !isStaff)) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -44,7 +47,7 @@ export function RequireAuth({ children, requireAdmin = false }: { children: Reac
     );
   }
 
-  if (!isAdmin && profile?.banned) {
+  if (!isStaff && profile?.banned) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="max-w-md rounded-3xl border border-destructive/30 bg-card p-8 text-center shadow-elegant">
