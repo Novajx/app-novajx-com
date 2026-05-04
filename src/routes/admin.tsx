@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   ShieldCheck, Users, FileCheck2, ArrowDownToLine, Loader2, Search,
-  CheckCircle2, XCircle, Clock, Ban, UserCheck, ExternalLink, Eye,
+  CheckCircle2, XCircle, Clock, Ban, UserCheck, ExternalLink, Eye, ArrowLeftRight,
 } from "lucide-react";
 import { RequireAuth } from "@/components/RequireAuth";
 import { AppShell } from "@/components/AppShell";
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — NovaJX" }] }),
 });
 
-type Tab = "overview" | "users" | "kyc" | "withdrawals";
+type Tab = "overview" | "users" | "kyc" | "transactions" | "withdrawals";
 
 function AdminPage() {
   const { isAdmin } = useAuth();
@@ -27,6 +27,7 @@ function AdminPage() {
     { id: "overview", label: "Overview", Icon: ShieldCheck },
     { id: "users", label: "Users", Icon: Users },
     { id: "kyc", label: "KYC", Icon: FileCheck2 },
+    { id: "transactions", label: "Transactions", Icon: ArrowLeftRight },
     ...(isAdmin ? [{ id: "withdrawals" as const, label: "Withdrawals", Icon: ArrowDownToLine }] : []),
   ] as const);
 
@@ -61,6 +62,7 @@ function AdminPage() {
       {tab === "overview" && <Overview />}
       {tab === "users" && <UsersTab />}
       {tab === "kyc" && <KycTab />}
+      {tab === "transactions" && <TransactionsTab />}
       {tab === "withdrawals" && isAdmin && <WithdrawalsTab />}
     </div>
   );
