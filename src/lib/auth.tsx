@@ -6,6 +6,8 @@ type AuthState = {
   user: User | null;
   session: Session | null;
   isAdmin: boolean;
+  isModerator: boolean;
+  isStaff: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
 };
@@ -14,6 +16,8 @@ const AuthCtx = createContext<AuthState>({
   user: null,
   session: null,
   isAdmin: false,
+  isModerator: false,
+  isStaff: false,
   loading: true,
   signOut: async () => {},
 });
@@ -22,6 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isModerator, setIsModerator] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -38,9 +43,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               .select("role")
               .eq("user_id", sess.user.id);
             setIsAdmin(!!data?.some((r) => r.role === "admin"));
+            setIsModerator(!!data?.some((r) => (r.role as string) === "moderator"));
           }, 0);
         } else {
           setIsAdmin(false);
+          setIsModerator(false);
         }
       }
     );
@@ -59,10 +66,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(null);
     setUser(null);
     setIsAdmin(false);
+    setIsModerator(false);
   };
 
   return (
-    <AuthCtx.Provider value={{ user, session, isAdmin, loading, signOut }}>
+    <AuthCtx.Provider value={{ user, session, isAdmin, isModerator, isStaff: isAdmin || isModerator, loading, signOut }}>
       {children}
     </AuthCtx.Provider>
   );
