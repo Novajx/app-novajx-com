@@ -10,16 +10,25 @@ import { RequireAuth } from "@/components/RequireAuth";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { fmtNJX } from "@/lib/format";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/admin")({
-  component: () => <RequireAuth requireAdmin><AppShell><AdminPage /></AppShell></RequireAuth>,
+  component: () => <RequireAuth requireStaff><AppShell><AdminPage /></AppShell></RequireAuth>,
   head: () => ({ meta: [{ title: "Admin — NovaJX" }] }),
 });
 
 type Tab = "overview" | "users" | "kyc" | "withdrawals";
 
 function AdminPage() {
+  const { isAdmin } = useAuth();
   const [tab, setTab] = useState<Tab>("overview");
+
+  const tabs = ([
+    { id: "overview", label: "Overview", Icon: ShieldCheck },
+    { id: "users", label: "Users", Icon: Users },
+    { id: "kyc", label: "KYC", Icon: FileCheck2 },
+    ...(isAdmin ? [{ id: "withdrawals" as const, label: "Withdrawals", Icon: ArrowDownToLine }] : []),
+  ] as const);
 
   return (
     <div className="space-y-5">
@@ -27,19 +36,16 @@ function AdminPage() {
         <div className="flex items-center gap-3">
           <ShieldCheck className="h-7 w-7" />
           <div>
-            <h1 className="font-display text-2xl font-bold">Admin Panel</h1>
-            <p className="text-sm opacity-80">Manage users, KYC and withdrawals</p>
+            <h1 className="font-display text-2xl font-bold">{isAdmin ? "Admin Panel" : "Moderator Dashboard"}</h1>
+            <p className="text-sm opacity-80">
+              {isAdmin ? "Manage users, KYC and withdrawals" : "Manage users, KYC and view transactions"}
+            </p>
           </div>
         </div>
       </div>
 
       <div className="flex gap-2 overflow-x-auto rounded-2xl border border-border/60 bg-card p-1.5 shadow-soft">
-        {([
-          { id: "overview", label: "Overview", Icon: ShieldCheck },
-          { id: "users", label: "Users", Icon: Users },
-          { id: "kyc", label: "KYC", Icon: FileCheck2 },
-          { id: "withdrawals", label: "Withdrawals", Icon: ArrowDownToLine },
-        ] as const).map(({ id, label, Icon }) => (
+        {tabs.map(({ id, label, Icon }) => (
           <button
             key={id}
             onClick={() => setTab(id)}
@@ -55,7 +61,7 @@ function AdminPage() {
       {tab === "overview" && <Overview />}
       {tab === "users" && <UsersTab />}
       {tab === "kyc" && <KycTab />}
-      {tab === "withdrawals" && <WithdrawalsTab />}
+      {tab === "withdrawals" && isAdmin && <WithdrawalsTab />}
     </div>
   );
 }
@@ -131,7 +137,7 @@ function UsersTab() {
 
   const toggleBan = useMutation({
     mutationFn: async ({ id, banned }: { id: string; banned: boolean }) => {
-      const { error } = await supabase.from("profiles").update({ banned }).eq("id", id);
+      const { error } = await supabase.rpc("admin_set_banned", { _user_id: id, _banned: banned });
       if (error) throw error;
     },
     onSuccess: (_, v) => {
