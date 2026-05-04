@@ -487,6 +487,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
       request_withdrawal: {
         Args: { _amount: number; _wallet_address: string }
         Returns: Json
@@ -522,7 +523,7 @@ export type Database = {
           }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "moderator"
       kyc_status: "not_submitted" | "pending" | "approved" | "rejected"
       referral_status: "active" | "inactive"
       withdrawal_status: "pending" | "approved" | "rejected" | "paid"
@@ -653,7 +654,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "moderator"],
       kyc_status: ["not_submitted", "pending", "approved", "rejected"],
       referral_status: ["active", "inactive"],
       withdrawal_status: ["pending", "approved", "rejected", "paid"],
