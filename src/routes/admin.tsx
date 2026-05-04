@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   ShieldCheck, Users, FileCheck2, ArrowDownToLine, Loader2, Search,
-  CheckCircle2, XCircle, Clock, Ban, UserCheck, ExternalLink, Eye,
+  CheckCircle2, XCircle, Clock, Ban, UserCheck, ExternalLink, Eye, ArrowLeftRight,
 } from "lucide-react";
 import { RequireAuth } from "@/components/RequireAuth";
 import { AppShell } from "@/components/AppShell";
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — NovaJX" }] }),
 });
 
-type Tab = "overview" | "users" | "kyc" | "withdrawals";
+type Tab = "overview" | "users" | "kyc" | "transactions" | "withdrawals";
 
 function AdminPage() {
   const { isAdmin } = useAuth();
@@ -27,6 +27,7 @@ function AdminPage() {
     { id: "overview", label: "Overview", Icon: ShieldCheck },
     { id: "users", label: "Users", Icon: Users },
     { id: "kyc", label: "KYC", Icon: FileCheck2 },
+    { id: "transactions", label: "Transactions", Icon: ArrowLeftRight },
     ...(isAdmin ? [{ id: "withdrawals" as const, label: "Withdrawals", Icon: ArrowDownToLine }] : []),
   ] as const);
 
@@ -61,6 +62,7 @@ function AdminPage() {
       {tab === "overview" && <Overview />}
       {tab === "users" && <UsersTab />}
       {tab === "kyc" && <KycTab />}
+      {tab === "transactions" && <TransactionsTab />}
       {tab === "withdrawals" && isAdmin && <WithdrawalsTab />}
     </div>
   );
@@ -313,6 +315,69 @@ function KycCard({ k, onReview, pending }: { k: any; onReview: (v: { id: string;
         <div onClick={() => setPreviewing(null)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
           <img src={previewing} alt="document" className="max-h-[90vh] max-w-full rounded-lg" />
         </div>
+      )}
+    </div>
+  );
+}
+
+function TransactionsTab() {
+  const [q, setQ] = useState("");
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-transactions", q],
+    queryFn: async () => {
+      const { data: txs, error } = await supabase
+        .from("transactions")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      const ids = Array.from(new Set((txs ?? []).flatMap((t) => [t.sender_id, t.receiver_id])));
+      const { data: profs } = ids.length
+        ? await supabase.from("profiles").select("id, full_name, email").in("id", ids)
+        : { data: [] as { id: string; full_name: string; email: string }[] };
+      const m = new Map(profs?.map((p) => [p.id, p]));
+      const enriched = (txs ?? []).map((t) => ({ ...t, sender: m.get(t.sender_id), receiver: m.get(t.receiver_id) }));
+      const ql = q.trim().toLowerCase();
+      if (!ql) return enriched;
+      return enriched.filter((t) =>
+        [t.sender?.email, t.sender?.full_name, t.receiver?.email, t.receiver?.full_name, t.type, t.note]
+          .some((v) => v?.toLowerCase().includes(ql))
+      );
+    },
+  });
+
+  return (
+    <div className="rounded-3xl border border-border/60 bg-card p-5 shadow-soft">
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search transactions..."
+          className="w-full rounded-xl border border-border bg-background py-2.5 pl-9 pr-4 text-sm outline-none focus:border-primary"
+        />
+      </div>
+      {isLoading ? <Loading /> : !data?.length ? (
+        <p className="mt-6 text-center text-sm text-muted-foreground">No transactions found.</p>
+      ) : (
+        <ul className="mt-4 divide-y divide-border/50">
+          {data.map((t) => (
+            <li key={t.id} className="py-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t.type}</p>
+                  <p className="truncate text-sm">
+                    <span className="font-medium">{t.sender?.full_name || t.sender?.email || "—"}</span>
+                    <span className="mx-1 text-muted-foreground">→</span>
+                    <span className="font-medium">{t.receiver?.full_name || t.receiver?.email || "—"}</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground">{new Date(t.created_at).toLocaleString()}</p>
+                </div>
+                <p className="shrink-0 font-mono text-sm font-bold">{fmtNJX(t.amount, 2)}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
