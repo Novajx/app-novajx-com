@@ -14,7 +14,7 @@ const navItems = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isStaff } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-hero pb-24">
@@ -25,11 +25,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <span className="font-display text-lg font-bold tracking-tight">NovaJX</span>
           </Link>
           <div className="flex items-center gap-2">
-            {isAdmin && (
+            {isStaff && (
               <Button asChild variant="outline" size="sm" className="gap-1.5">
                 <Link to={"/admin" as any}>
                   <ShieldCheck className="h-4 w-4" />
-                  <span className="hidden sm:inline">Admin</span>
+                  <span className="hidden sm:inline">{isAdmin ? "Admin" : "Moderator"}</span>
                 </Link>
               </Button>
             )}
