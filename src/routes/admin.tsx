@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   ShieldCheck, Users, FileCheck2, ArrowDownToLine, Loader2, Search,
-  CheckCircle2, XCircle, Clock, Ban, UserCheck, ExternalLink, Eye, ArrowLeftRight,
+  CheckCircle2, XCircle, Clock, Ban, UserCheck, ExternalLink, Eye, ArrowLeftRight, Shield,
 } from "lucide-react";
 import { RequireAuth } from "@/components/RequireAuth";
 import { AppShell } from "@/components/AppShell";
@@ -114,6 +114,7 @@ function Overview() {
 }
 
 function UsersTab() {
+  const { isAdmin } = useAuth();
   const qc = useQueryClient();
   const [q, setQ] = useState("");
 
@@ -133,7 +134,16 @@ function UsersTab() {
         ? await supabase.from("wallets").select("user_id, balance, total_mined").in("user_id", ids)
         : { data: [] as { user_id: string; balance: number; total_mined: number }[] };
       const wmap = new Map(wallets?.map((w) => [w.user_id, w]));
-      return (profiles ?? []).map((p) => ({ ...p, wallet: wmap.get(p.id) }));
+      const { data: roles } = ids.length
+        ? await supabase.from("user_roles").select("user_id, role").in("user_id", ids)
+        : { data: [] as { user_id: string; role: string }[] };
+      const rmap = new Map<string, string[]>();
+      (roles ?? []).forEach((r) => {
+        const arr = rmap.get(r.user_id) ?? [];
+        arr.push(r.role);
+        rmap.set(r.user_id, arr);
+      });
+      return (profiles ?? []).map((p) => ({ ...p, wallet: wmap.get(p.id), roles: rmap.get(p.id) ?? [] }));
     },
   });
 
@@ -144,6 +154,18 @@ function UsersTab() {
     },
     onSuccess: (_, v) => {
       toast.success(v.banned ? "User banned" : "User unbanned");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const toggleMod = useMutation({
+    mutationFn: async ({ id, makeMod }: { id: string; makeMod: boolean }) => {
+      const { error } = await supabase.rpc("admin_set_role" as any, { _user_id: id, _make_moderator: makeMod });
+      if (error) throw error;
+    },
+    onSuccess: (_, v) => {
+      toast.success(v.makeMod ? "Moderator granted" : "Moderator revoked");
       qc.invalidateQueries({ queryKey: ["admin-users"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -173,12 +195,27 @@ function UsersTab() {
                 <p className="mt-0.5 text-xs text-muted-foreground">
                   Bal <span className="font-mono text-foreground">{fmtNJX(u.wallet?.balance ?? 0, 2)}</span> · Mined <span className="font-mono text-foreground">{fmtNJX(u.wallet?.total_mined ?? 0, 0)}</span>
                 </p>
+                {u.roles?.includes("admin") && (
+                  <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary"><ShieldCheck className="h-3 w-3" /> Admin</span>
+                )}
+                {u.roles?.includes("moderator") && (
+                  <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-2 py-0.5 text-[10px] font-semibold text-blue-500"><Shield className="h-3 w-3" /> Moderator</span>
+                )}
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 {u.banned ? (
                   <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2 py-0.5 text-xs font-semibold text-red-500"><Ban className="h-3 w-3" /> Banned</span>
                 ) : (
                   <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-500"><UserCheck className="h-3 w-3" /> Active</span>
+                )}
+                {isAdmin && !u.roles?.includes("admin") && (
+                  <button
+                    onClick={() => toggleMod.mutate({ id: u.id, makeMod: !u.roles?.includes("moderator") })}
+                    disabled={toggleMod.isPending}
+                    className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:opacity-50"
+                  >
+                    {u.roles?.includes("moderator") ? "Revoke Mod" : "Make Mod"}
+                  </button>
                 )}
                 <button
                   onClick={() => toggleBan.mutate({ id: u.id, banned: !u.banned })}
