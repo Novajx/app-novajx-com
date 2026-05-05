@@ -29,7 +29,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Button asChild variant="outline" size="sm" className="gap-1.5">
                 <Link to={"/admin" as any}>
                   <ShieldCheck className="h-4 w-4" />
-                  <span className="hidden sm:inline">{isAdmin ? "Admin" : "Moderator"}</span>
+                  <span>{isAdmin ? "Admin" : "Moderator"}</span>
                 </Link>
               </Button>
             )}
