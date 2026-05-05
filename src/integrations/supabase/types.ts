@@ -465,6 +465,10 @@ export type Database = {
         Args: { _banned: boolean; _user_id: string }
         Returns: undefined
       }
+      admin_set_role: {
+        Args: { _make_moderator: boolean; _user_id: string }
+        Returns: undefined
+      }
       check_rate_limit: {
         Args: { _action: string; _max: number; _window: string }
         Returns: undefined
