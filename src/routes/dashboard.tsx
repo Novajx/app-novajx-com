@@ -167,15 +167,35 @@ function Dashboard() {
 
       {/* Collect Rewards card */}
       <div className="rounded-3xl border border-border/60 bg-card p-7 text-center shadow-soft">
-        <div className="mx-auto flex h-32 w-32 items-center justify-center">
+        <div className="mx-auto flex h-36 w-36 items-center justify-center rounded-full">
           <AnimatePresence mode="wait">
             {canClaim ? (
-              <motion.div key="ready" initial={{ scale: 0 }} animate={{ scale: 1 }} className="animate-coin-pulse rounded-full">
-                <CoinIcon size={120} />
+              <motion.div
+                key="ready"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="animate-coin-pulse flex h-36 w-36 items-center justify-center rounded-full shadow-gold"
+                style={{
+                  background:
+                    "radial-gradient(circle at 50% 50%, oklch(0.92 0.18 92 / 0.45) 0%, oklch(0.84 0.18 88 / 0.18) 45%, transparent 72%)",
+                  boxShadow:
+                    "0 0 60px oklch(0.92 0.18 92 / 0.55), inset 0 0 24px oklch(0.92 0.18 92 / 0.25)",
+                }}
+              >
+                <CoinIcon size={120} className="rounded-full" />
               </motion.div>
             ) : (
-              <motion.div key="cool" initial={{ scale: 0 }} animate={{ scale: 1 }} className="opacity-60">
-                <CoinIcon size={120} />
+              <motion.div
+                key="cool"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="flex h-36 w-36 items-center justify-center rounded-full opacity-60"
+                style={{
+                  background:
+                    "radial-gradient(circle at 50% 50%, oklch(0.84 0.18 88 / 0.25) 0%, transparent 70%)",
+                }}
+              >
+                <CoinIcon size={120} className="rounded-full" />
               </motion.div>
             )}
           </AnimatePresence>
