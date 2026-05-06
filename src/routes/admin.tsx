@@ -38,9 +38,6 @@ function AdminPage() {
           <ShieldCheck className="h-7 w-7" />
           <div>
             <h1 className="font-display text-2xl font-bold">{isAdmin ? "Admin Panel" : "Moderator Dashboard"}</h1>
-            <p className="text-sm opacity-80">
-              {isAdmin ? "Manage users, KYC and withdrawals" : "Manage users, KYC and view transactions"}
-            </p>
           </div>
         </div>
       </div>
