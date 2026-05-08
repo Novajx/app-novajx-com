@@ -34,7 +34,7 @@ export const Route = createFileRoute("/wallet")({
   head: () => ({ meta: [{ title: "Wallet — NovaJX" }] }),
 });
 
-type Tab = "send" | "swap" | "rnt" | "history";
+type Tab = "send" | "swap" | "history";
 
 function WalletPage() {
   const { user } = useAuth();
@@ -47,10 +47,6 @@ function WalletPage() {
   const [sendAmount, setSendAmount] = useState("");
   const [lookup, setLookup] = useState<{ id: string; full_name: string; referral_code: string } | null>(null);
   const [lookupErr, setLookupErr] = useState<string | null>(null);
-
-  // RNT transfer state
-  const [rntRecipient, setRntRecipient] = useState("");
-  const [rntAmount, setRntAmount] = useState("");
 
   // Swap state
   const [swapAmount, setSwapAmount] = useState("");
@@ -182,27 +178,6 @@ function WalletPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const sendRnt = useMutation({
-    mutationFn: async () => {
-      const amt = Number(rntAmount);
-      if (!rntRecipient.trim()) throw new Error("Enter a recipient");
-      if (!amt || amt <= 0) throw new Error("Amount must be greater than 0");
-      if (amt > Number((wallet as any)?.rnt_balance ?? 0)) throw new Error("Insufficient RNT balance");
-      const { error } = await (supabase as any).rpc("transfer_rnt", {
-        _recipient: rntRecipient.trim(),
-        _amount: amt,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("RNT sent!", { description: `${rntAmount} RNT delivered.` });
-      setRntRecipient("");
-      setRntAmount("");
-      qc.invalidateQueries();
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
   if (isLoading)
     return (
       <div className="flex h-64 items-center justify-center">
@@ -299,22 +274,14 @@ function WalletPage() {
             <p className="mt-0.5 text-xs text-muted-foreground">Referral Reward Token</p>
             <p className="mt-0.5 text-[11px] text-muted-foreground">Earned from successful referrals</p>
           </div>
-          <button
-            type="button"
-            onClick={() => setTab("rnt")}
-            className="shrink-0 rounded-xl border border-border bg-background px-3 py-2 text-xs font-semibold transition-smooth hover:border-primary"
-          >
-            Send RNT
-          </button>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="grid grid-cols-4 gap-1 rounded-2xl border border-border/60 bg-card p-1">
+      <div className="grid grid-cols-3 gap-1 rounded-2xl border border-border/60 bg-card p-1">
         {([
           { key: "send", label: "Send", icon: Send },
           { key: "swap", label: "Swap", icon: Repeat },
-          { key: "rnt", label: "RNT", icon: Gift },
           { key: "history", label: "History", icon: Clock },
         ] as const).map((t) => (
           <button
@@ -520,76 +487,6 @@ function WalletPage() {
                 )}
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* RNT TAB */}
-      {tab === "rnt" && (
-        <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
-          <div className="flex items-center gap-2">
-            <Gift className="h-5 w-5 text-primary" />
-            <h2 className="font-display text-lg font-bold">Send RNT</h2>
-          </div>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Transfer Referral Reward Tokens to another NovaJX user.
-          </p>
-
-          <div className="mt-3 rounded-xl border border-border/60 bg-background px-3 py-2 text-xs">
-            <p className="text-muted-foreground">RNT Balance</p>
-            <p className="mt-0.5 font-display text-base font-bold">{fmtNJX(rnt, 2)} RNT</p>
-          </div>
-
-          <div className="mt-4 space-y-3">
-            <label className="block">
-              <span className="mb-1.5 block text-xs font-medium text-muted-foreground">
-                Recipient (Wallet Address, Email, or Referral Code)
-              </span>
-              <input
-                type="text"
-                value={rntRecipient}
-                onChange={(e) => setRntRecipient(e.target.value)}
-                disabled={rnt <= 0}
-                className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary disabled:opacity-50"
-                placeholder="NJX-XXXXXXXX, email, or NJXABC12"
-              />
-            </label>
-
-            <label className="block">
-              <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Amount (RNT)</span>
-              <input
-                type="number"
-                value={rntAmount}
-                step="0.01"
-                min="0.01"
-                max={rnt}
-                onChange={(e) => setRntAmount(e.target.value)}
-                disabled={rnt <= 0}
-                className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary disabled:opacity-50"
-                placeholder="0.00"
-              />
-              <p className="mt-1 text-[11px] text-muted-foreground">Available: {fmtNJX(rnt, 2)} RNT</p>
-            </label>
-
-            {rnt <= 0 && (
-              <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-600">
-                You don't have any RNT yet. Invite friends to earn 1 RNT per successful signup.
-              </p>
-            )}
-
-            <button
-              onClick={() => sendRnt.mutate()}
-              disabled={rnt <= 0 || sendRnt.isPending || !rntRecipient.trim() || !rntAmount}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-elegant transition-bounce hover:scale-[1.02] disabled:scale-100 disabled:opacity-60"
-            >
-              {sendRnt.isPending ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <>
-                  <Send className="h-4 w-4" /> Send RNT
-                </>
-              )}
-            </button>
           </div>
         </div>
       )}
