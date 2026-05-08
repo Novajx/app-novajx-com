@@ -299,13 +299,13 @@ function WalletPage() {
             <p className="mt-0.5 text-xs text-muted-foreground">Referral Reward Token</p>
             <p className="mt-0.5 text-[11px] text-muted-foreground">Earned from successful referrals</p>
           </div>
-          <Link
-            to={"/kyc" as any}
-            className="flex shrink-0 items-center gap-1.5 rounded-xl border border-border bg-background px-3 py-2 text-xs font-semibold transition-smooth hover:border-primary"
+          <button
+            type="button"
+            onClick={() => setTab("rnt")}
+            className="shrink-0 rounded-xl border border-border bg-background px-3 py-2 text-xs font-semibold transition-smooth hover:border-primary"
           >
-            <ShieldAlert className="h-3.5 w-3.5 text-primary" />
-            KYC
-          </Link>
+            Send RNT
+          </button>
         </div>
       </div>
 
