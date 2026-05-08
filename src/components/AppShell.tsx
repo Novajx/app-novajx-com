@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Gift, Users, Wallet, User as UserIcon, Trophy, ShieldCheck, ShieldAlert } from "lucide-react";
+import { Gift, Users, Wallet, User as UserIcon, ShieldCheck, ShieldAlert } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { CoinIcon } from "@/components/CoinIcon";
@@ -7,7 +7,7 @@ import { CoinIcon } from "@/components/CoinIcon";
 const navItems = [
   { to: "/dashboard", label: "Collect", icon: Gift },
   { to: "/referrals", label: "Invite", icon: Users },
-  { to: "/leaderboard", label: "Top", icon: Trophy },
+  { to: "/kyc", label: "KYC", icon: ShieldAlert },
   { to: "/wallet", label: "Wallet", icon: Wallet },
   { to: "/profile", label: "Profile", icon: UserIcon },
 ] as const;
@@ -25,18 +25,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <span className="font-display text-lg font-bold tracking-tight">NovaJX</span>
           </Link>
           <div className="flex items-center gap-2">
-            {isStaff ? (
+            {isStaff && (
               <Button asChild variant="outline" size="sm" className="gap-1.5">
                 <Link to={"/admin" as any}>
                   <ShieldCheck className="h-4 w-4" />
                   <span>{isAdmin ? "Admin" : "Moderator"}</span>
-                </Link>
-              </Button>
-            ) : (
-              <Button asChild variant="outline" size="sm" className="gap-1.5">
-                <Link to={"/kyc" as any}>
-                  <ShieldAlert className="h-4 w-4" />
-                  <span>KYC</span>
                 </Link>
               </Button>
             )}
