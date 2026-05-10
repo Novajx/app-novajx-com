@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,7 +52,14 @@ function SignInPage() {
     setSubmitting(true);
     const { data: signInData, error } = await supabase.auth.signInWithPassword(data);
     setSubmitting(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      if (error.message.toLowerCase().includes("email not confirmed")) {
+        toast.error("Please verify your email before signing in.");
+      } else {
+        toast.error(error.message);
+      }
+      return;
+    }
     // Block banned users at the door
     const uid = signInData.user?.id;
     if (uid) {
@@ -64,6 +72,13 @@ function SignInPage() {
     }
     toast.success("Welcome back!");
     window.location.href = redirect;
+  };
+
+  const onGoogle = async () => {
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: `${window.location.origin}${redirect}`,
+    });
+    if (result.error) toast.error(result.error.message ?? "Google sign-in failed");
   };
 
   return (
@@ -91,6 +106,14 @@ function SignInPage() {
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign in"}
             </Button>
           </form>
+          <div className="my-4 flex items-center gap-3">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs text-muted-foreground">OR</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+          <Button type="button" variant="outline" onClick={onGoogle} className="w-full h-11">
+            Continue with Google
+          </Button>
           <div className="mt-5 flex items-center justify-between text-sm">
             <Link to="/forgot-password" className="text-muted-foreground hover:text-foreground">Forgot password?</Link>
             <Link to="/signup" search={{ ref: "" }} className="font-medium text-primary hover:underline">Create account</Link>
