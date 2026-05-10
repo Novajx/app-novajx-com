@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Users, Copy, Share2, Gift, Loader2, Mail, MessageCircle, Send, Facebook, Twitter, Linkedin } from "lucide-react";
+import { Users, Copy, Share2, Gift, Loader2, Mail, MessageCircle, Send, Twitter as TwitterIcon } from "lucide-react";
 import { RequireAuth } from "@/components/RequireAuth";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
@@ -62,9 +62,9 @@ function ReferralsPage() {
   const shareTargets = [
     { name: "WhatsApp", icon: MessageCircle, color: "bg-[#25D366]", href: `https://wa.me/?text=${enc(`${shareText} ${link}`)}` },
     { name: "Telegram", icon: Send, color: "bg-[#229ED9]", href: `https://t.me/share/url?url=${enc(link)}&text=${enc(shareText)}` },
-    { name: "Facebook", icon: Facebook, color: "bg-[#1877F2]", href: `https://www.facebook.com/sharer/sharer.php?u=${enc(link)}&quote=${enc(shareText)}` },
-    { name: "X / Twitter", icon: Twitter, color: "bg-black", href: `https://twitter.com/intent/tweet?text=${enc(shareText)}&url=${enc(link)}` },
-    { name: "LinkedIn", icon: Linkedin, color: "bg-[#0A66C2]", href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(link)}` },
+    { name: "Facebook", icon: Share2, color: "bg-[#1877F2]", href: `https://www.facebook.com/sharer/sharer.php?u=${enc(link)}&quote=${enc(shareText)}` },
+    { name: "X / Twitter", icon: TwitterIcon, color: "bg-black", href: `https://twitter.com/intent/tweet?text=${enc(shareText)}&url=${enc(link)}` },
+    { name: "LinkedIn", icon: Share2, color: "bg-[#0A66C2]", href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(link)}` },
     { name: "Email", icon: Mail, color: "bg-muted-foreground", href: `mailto:?subject=${enc("Join me on NovaJX")}&body=${enc(`${shareText}\n\n${link}`)}` },
   ];
 
