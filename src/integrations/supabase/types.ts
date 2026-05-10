@@ -529,7 +529,7 @@ export type Database = {
     Enums: {
       app_role: "admin" | "user" | "moderator"
       kyc_status: "not_submitted" | "pending" | "approved" | "rejected"
-      referral_status: "active" | "inactive"
+      referral_status: "active" | "inactive" | "pending"
       withdrawal_status: "pending" | "approved" | "rejected" | "paid"
     }
     CompositeTypes: {
@@ -660,7 +660,7 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "user", "moderator"],
       kyc_status: ["not_submitted", "pending", "approved", "rejected"],
-      referral_status: ["active", "inactive"],
+      referral_status: ["active", "inactive", "pending"],
       withdrawal_status: ["pending", "approved", "rejected", "paid"],
     },
   },
