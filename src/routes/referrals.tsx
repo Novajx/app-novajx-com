@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Users, Copy, Share2, Gift, Loader2 } from "lucide-react";
+import { Users, Copy, Share2, Gift, Loader2, Mail, MessageCircle, Send } from "lucide-react";
 import { RequireAuth } from "@/components/RequireAuth";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
@@ -57,6 +57,16 @@ function ReferralsPage() {
 
   const code = profile?.referral_code ?? "";
   const link = typeof window !== "undefined" ? `${window.location.origin}/signup?ref=${code}` : "";
+  const shareText = `Join NovaJX and start earning digital credits. Use my code ${code}:`;
+  const enc = encodeURIComponent;
+  const shareTargets = [
+    { name: "WhatsApp", icon: MessageCircle, color: "bg-[#25D366]", href: `https://wa.me/?text=${enc(`${shareText} ${link}`)}` },
+    { name: "Telegram", icon: Send, color: "bg-[#229ED9]", href: `https://t.me/share/url?url=${enc(link)}&text=${enc(shareText)}` },
+    { name: "Facebook", icon: Share2, color: "bg-[#1877F2]", href: `https://www.facebook.com/sharer/sharer.php?u=${enc(link)}&quote=${enc(shareText)}` },
+    { name: "X / Twitter", icon: Send, color: "bg-black", href: `https://twitter.com/intent/tweet?text=${enc(shareText)}&url=${enc(link)}` },
+    { name: "LinkedIn", icon: Share2, color: "bg-[#0A66C2]", href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(link)}` },
+    { name: "Email", icon: Mail, color: "bg-muted-foreground", href: `mailto:?subject=${enc("Join me on NovaJX")}&body=${enc(`${shareText}\n\n${link}`)}` },
+  ];
 
   const copyLink = () => {
     navigator.clipboard.writeText(link);
@@ -105,6 +115,28 @@ function ReferralsPage() {
       <div className="grid grid-cols-2 gap-3">
         <Stat icon={Users} label="Total Invites" value={stats?.total ?? 0} />
         <Stat icon={Gift} label="RNT Balance" value={`${fmtNJX(stats?.rnt, 2)}`} />
+      </div>
+
+      {/* Social share */}
+      <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
+        <h2 className="font-display text-lg font-bold">Share on social</h2>
+        <p className="mt-1 text-xs text-muted-foreground">Tap a platform to invite friends instantly.</p>
+        <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-6">
+          {shareTargets.map((s) => (
+            <a
+              key={s.name}
+              href={s.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col items-center gap-2 rounded-2xl border border-border/60 p-3 transition-smooth hover:border-primary/60 hover:bg-accent"
+            >
+              <span className={`flex h-11 w-11 items-center justify-center rounded-full text-white ${s.color}`}>
+                <s.icon className="h-5 w-5" />
+              </span>
+              <span className="text-[11px] font-medium">{s.name}</span>
+            </a>
+          ))}
+        </div>
       </div>
 
       {/* List */}
