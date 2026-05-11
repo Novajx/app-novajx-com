@@ -49,7 +49,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "manifest", href: "/manifest.json" },
       { rel: "apple-touch-icon", href: "/icons/icon-192.png" },
       { rel: "icon", type: "image/png", href: "/icons/icon-192.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
