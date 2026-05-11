@@ -497,20 +497,15 @@ export type Database = {
         Returns: Json
       }
       swap_njx: { Args: { _amount: number }; Returns: Json }
-      transfer_njx:
-        | {
-            Args: { _amount: number; _note?: string; _recipient: string }
-            Returns: Json
-          }
-        | {
-            Args: {
-              _amount: number
-              _idempotency_key?: string
-              _note?: string
-              _recipient: string
-            }
-            Returns: Json
-          }
+      transfer_njx: {
+        Args: {
+          _amount: number
+          _idempotency_key?: string
+          _note?: string
+          _recipient: string
+        }
+        Returns: Json
+      }
       transfer_rnt:
         | {
             Args: { _amount: number; _note?: string; _recipient: string }
