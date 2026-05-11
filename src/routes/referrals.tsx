@@ -29,11 +29,17 @@ function ReferralsPage() {
   const { data: stats } = useQuery({
     queryKey: ["ref-detail", user?.id],
     queryFn: async () => {
-      const [{ count: total }, { data: wal }] = await Promise.all([
+      const [{ count: total }, { data: wal }, { data: refs }] = await Promise.all([
         supabase.from("referrals").select("*", { count: "exact", head: true }).eq("referrer_id", user!.id),
         supabase.from("wallets").select("rnt_balance").eq("user_id", user!.id).maybeSingle(),
+        supabase.from("referrals").select("total_bonus_earned").eq("referrer_id", user!.id),
       ]);
-      return { total: total ?? 0, rnt: Number((wal as any)?.rnt_balance ?? 0) };
+      const earned = (refs ?? []).reduce((s: number, r: any) => s + Number(r.total_bonus_earned ?? 0), 0);
+      return {
+        total: total ?? 0,
+        rnt: Number((wal as any)?.rnt_balance ?? 0),
+        earned,
+      };
     },
     enabled: !!user,
   });
@@ -115,6 +121,9 @@ function ReferralsPage() {
       <div className="grid grid-cols-2 gap-3">
         <Stat icon={Users} label="Total Invites" value={stats?.total ?? 0} />
         <Stat icon={Gift} label="RNT Balance" value={`${fmtNJX(stats?.rnt, 2)}`} />
+      </div>
+      <div className="grid grid-cols-1 gap-3">
+        <Stat icon={Gift} label="RNT Earned from Referrals" value={`${fmtNJX(stats?.earned, 2)}`} />
       </div>
 
       {/* Social share */}
