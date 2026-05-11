@@ -16,6 +16,8 @@ import {
   Gift,
   Copy,
   Check,
+  X,
+  Receipt,
 } from "lucide-react";
 import { RequireAuth } from "@/components/RequireAuth";
 import { AppShell } from "@/components/AppShell";
@@ -41,6 +43,7 @@ function WalletPage() {
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("send");
   const [copied, setCopied] = useState(false);
+  const [receiptTx, setReceiptTx] = useState<any | null>(null);
 
   // Send NJX state
   const [recipient, setRecipient] = useState("");
@@ -193,14 +196,12 @@ function WalletPage() {
   // Swap eligibility: KYC-approved users can swap any positive amount immediately
   const canSwap = kycApproved && locked > 0;
 
-  // Transfer eligibility (mirrors backend transfer_njx gates)
+  // Transfer eligibility — anyone with available balance can send
   const hasAvailable = balance > 0;
-  const canSend = kycApproved && hasAvailable;
-  const sendBlockReason = !kycApproved
-    ? "KYC approval required to send credits"
-    : !hasAvailable
-      ? "No available credits. Convert your credits first"
-      : null;
+  const canSend = hasAvailable;
+  const sendBlockReason = !hasAvailable
+    ? "No available credits. Convert your locked credits first"
+    : null;
 
   return (
     <div className="space-y-5">
@@ -319,7 +320,7 @@ function WalletPage() {
           </div>
 
           <p className="mt-3 rounded-xl bg-muted/60 px-3 py-2 text-[11px] text-muted-foreground">
-            You can send NJX after KYC approval and credit conversion.
+            Send NJX instantly to anyone with a wallet address, email, or referral code.
           </p>
 
           {sendBlockReason && (
@@ -327,12 +328,7 @@ function WalletPage() {
               <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
               <div className="flex-1">
                 <p className="font-semibold">{sendBlockReason}</p>
-                {!kycApproved && (
-                  <Link to={"/kyc" as any} className="mt-1 inline-block font-semibold text-primary underline">
-                    Verify KYC →
-                  </Link>
-                )}
-                {kycApproved && !hasAvailable && (
+                {!hasAvailable && (
                   <button
                     type="button"
                     onClick={() => setTab("swap")}
@@ -507,7 +503,11 @@ function WalletPage() {
                   const Icon = isSent ? ArrowUpRight : ArrowDownLeft;
                   const unit = t.type === "rnt_transfer" ? "RNT" : "NJX";
                   return (
-                    <li key={t.id} className="flex items-center justify-between gap-3 py-3">
+                    <li
+                      key={t.id}
+                      onClick={() => setReceiptTx({ ...t, _name: name, _isSent: isSent, _unit: unit })}
+                      className="flex cursor-pointer items-center justify-between gap-3 py-3 transition-smooth hover:bg-accent/40 rounded-lg px-2 -mx-2"
+                    >
                       <div className="flex items-center gap-3">
                         <div
                           className={`flex h-9 w-9 items-center justify-center rounded-full ${
@@ -536,6 +536,94 @@ function WalletPage() {
                 })}
               </ul>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Transaction Receipt Modal */}
+      {receiptTx && (
+        <div
+          onClick={() => setReceiptTx(null)}
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm p-4 sm:items-center"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md rounded-3xl border border-border/60 bg-card p-6 shadow-elegant"
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-2">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-primary text-primary-foreground">
+                  <Receipt className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-display text-lg font-bold">Transaction Receipt</h3>
+                  <p className="text-[11px] text-muted-foreground">
+                    {receiptTx.status === "completed" ? "Successful" : receiptTx.status}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setReceiptTx(null)}
+                className="rounded-full p-1.5 text-muted-foreground hover:bg-accent"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="mt-5 rounded-2xl bg-muted/40 p-5 text-center">
+              <p className="text-xs text-muted-foreground">
+                {receiptTx._isSent ? "Amount Sent" : "Amount Received"}
+              </p>
+              <p
+                className={`mt-1 font-display text-3xl font-bold ${
+                  receiptTx._isSent ? "text-red-500" : "text-emerald-500"
+                }`}
+              >
+                {receiptTx._isSent ? "-" : "+"}
+                {fmtNJX(receiptTx.amount, 4)} {receiptTx._unit}
+              </p>
+            </div>
+
+            <dl className="mt-5 space-y-3 text-sm">
+              <div className="flex items-start justify-between gap-3">
+                <dt className="text-muted-foreground">Type</dt>
+                <dd className="font-semibold capitalize">{String(receiptTx.type).replace("_", " ")}</dd>
+              </div>
+              <div className="flex items-start justify-between gap-3">
+                <dt className="text-muted-foreground">{receiptTx._isSent ? "To" : "From"}</dt>
+                <dd className="text-right font-semibold">{receiptTx._name}</dd>
+              </div>
+              <div className="flex items-start justify-between gap-3">
+                <dt className="text-muted-foreground">Date</dt>
+                <dd className="text-right font-semibold">
+                  {new Date(receiptTx.created_at).toLocaleString()}
+                </dd>
+              </div>
+              <div className="flex items-start justify-between gap-3">
+                <dt className="text-muted-foreground">Status</dt>
+                <dd className="font-semibold capitalize text-emerald-500">{receiptTx.status}</dd>
+              </div>
+              {receiptTx.note && (
+                <div className="flex items-start justify-between gap-3">
+                  <dt className="text-muted-foreground">Note</dt>
+                  <dd className="text-right font-semibold">{receiptTx.note}</dd>
+                </div>
+              )}
+              <div className="flex items-start justify-between gap-3">
+                <dt className="text-muted-foreground">Tx ID</dt>
+                <dd className="text-right font-mono text-[11px] break-all">{receiptTx.id}</dd>
+              </div>
+            </dl>
+
+            <button
+              onClick={async () => {
+                await navigator.clipboard.writeText(receiptTx.id);
+                toast.success("Transaction ID copied");
+              }}
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-background py-3 text-sm font-semibold transition-smooth hover:border-primary"
+            >
+              <Copy className="h-3.5 w-3.5" /> Copy Transaction ID
+            </button>
           </div>
         </div>
       )}
