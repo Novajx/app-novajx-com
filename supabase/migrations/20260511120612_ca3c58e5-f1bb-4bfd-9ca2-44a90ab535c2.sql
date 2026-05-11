@@ -1,0 +1,1 @@
+CREATE POLICY "staff read all kyc" ON storage.objects FOR SELECT USING (bucket_id = 'kyc-documents' AND public.is_staff(auth.uid()));
