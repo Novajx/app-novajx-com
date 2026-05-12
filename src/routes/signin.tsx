@@ -74,13 +74,6 @@ function SignInPage() {
     window.location.href = redirect;
   };
 
-  const onGoogle = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}${redirect}`,
-    });
-    if (result.error) toast.error(result.error.message ?? "Google sign-in failed");
-  };
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-hero px-4 py-10">
       <div className="w-full max-w-md">
@@ -106,14 +99,6 @@ function SignInPage() {
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign in"}
             </Button>
           </form>
-          <div className="my-4 flex items-center gap-3">
-            <div className="h-px flex-1 bg-border" />
-            <span className="text-xs text-muted-foreground">OR</span>
-            <div className="h-px flex-1 bg-border" />
-          </div>
-          <Button type="button" variant="outline" onClick={onGoogle} className="w-full h-11">
-            Continue with Google
-          </Button>
           <div className="mt-5 flex items-center justify-between text-sm">
             <Link to="/forgot-password" className="text-muted-foreground hover:text-foreground">Forgot password?</Link>
             <Link to="/signup" search={{ ref: "" }} className="font-medium text-primary hover:underline">Create account</Link>
