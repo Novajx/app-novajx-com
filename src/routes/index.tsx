@@ -67,23 +67,6 @@ function Landing() {
           </Button>
         </div>
 
-        <div className="mt-6 flex justify-center">
-          <a
-            href="/downloads/NovaJX.apk"
-            download
-            className="group inline-flex items-center gap-3 rounded-2xl border border-primary/40 bg-card/60 px-6 py-3 shadow-elegant backdrop-blur-md transition-smooth hover:border-primary hover:bg-primary/10"
-          >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground shadow-glow">
-              <Download className="h-5 w-5" />
-            </div>
-            <div className="text-left">
-              <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Get it for</div>
-              <div className="font-display text-base font-semibold leading-tight">Download NOVAJX App</div>
-            </div>
-            <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-1" />
-          </a>
-        </div>
-
         <div className="mt-16 flex justify-center sm:mt-20">
           <div className="relative">
             <div className="absolute inset-0 animate-coin-pulse rounded-full" />
