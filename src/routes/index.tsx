@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Gift, Users, Trophy, ShieldCheck, ArrowRight, Sparkles, Download } from "lucide-react";
+import { Gift, Users, Trophy, ShieldCheck, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/novajx-mark.png";
 import { CoinIcon } from "@/components/CoinIcon";
@@ -23,13 +23,6 @@ function Landing() {
           <span className="font-display text-lg font-bold tracking-tight sm:text-xl">NovaJX</span>
         </Link>
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <Button asChild variant="outline" size="sm" className="gap-1.5 border-primary/40 text-primary hover:bg-primary/10">
-            <a href="/downloads/NovaJX.apk" download>
-              <Download className="h-4 w-4" />
-              <span className="hidden sm:inline">Download App</span>
-              <span className="sm:hidden">App</span>
-            </a>
-          </Button>
           <Button asChild variant="ghost" size="sm">
             <Link to="/signin" search={{ redirect: "/dashboard" }}>Sign in</Link>
           </Button>
