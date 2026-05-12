@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Gift, Users, Trophy, ShieldCheck, ArrowRight, Sparkles } from "lucide-react";
+import { Gift, Users, Trophy, ShieldCheck, ArrowRight, Sparkles, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/novajx-mark.png";
 import { CoinIcon } from "@/components/CoinIcon";
@@ -23,6 +23,13 @@ function Landing() {
           <span className="font-display text-lg font-bold tracking-tight sm:text-xl">NovaJX</span>
         </Link>
         <div className="flex items-center gap-1.5 sm:gap-2">
+          <Button asChild variant="outline" size="sm" className="gap-1.5 border-primary/40 text-primary hover:bg-primary/10">
+            <a href="/downloads/NovaJX.apk" download>
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">Download App</span>
+              <span className="sm:hidden">App</span>
+            </a>
+          </Button>
           <Button asChild variant="ghost" size="sm">
             <Link to="/signin" search={{ redirect: "/dashboard" }}>Sign in</Link>
           </Button>
@@ -58,6 +65,23 @@ function Landing() {
           <Button asChild size="lg" variant="ghost" className="h-12 w-full px-8 text-foreground hover:bg-primary/10 sm:w-auto">
             <Link to="/leaderboard">View leaderboard</Link>
           </Button>
+        </div>
+
+        <div className="mt-6 flex justify-center">
+          <a
+            href="/downloads/NovaJX.apk"
+            download
+            className="group inline-flex items-center gap-3 rounded-2xl border border-primary/40 bg-card/60 px-6 py-3 shadow-elegant backdrop-blur-md transition-smooth hover:border-primary hover:bg-primary/10"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground shadow-glow">
+              <Download className="h-5 w-5" />
+            </div>
+            <div className="text-left">
+              <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Get it for</div>
+              <div className="font-display text-base font-semibold leading-tight">Download NOVAJX App</div>
+            </div>
+            <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-1" />
+          </a>
         </div>
 
         <div className="mt-16 flex justify-center sm:mt-20">
