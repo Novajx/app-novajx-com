@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,19 +42,10 @@ function SignUpPage() {
   const { user, loading } = useAuth();
   const [submitting, setSubmitting] = useState(false);
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { referral_code: ref || "" },
   });
-
-  const onGoogle = async () => {
-    const referralCode = watch("referral_code")?.trim();
-    if (referralCode) localStorage.setItem(REFERRAL_STORAGE_KEY, referralCode);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/dashboard`,
-    });
-    if (result.error) toast.error(result.error.message ?? "Google sign-in failed");
-  };
 
   useEffect(() => { if (ref) setValue("referral_code", ref); }, [ref, setValue]);
   useEffect(() => { if (!loading && user) navigate({ to: "/dashboard" }); }, [user, loading, navigate]);
@@ -120,14 +110,6 @@ function SignUpPage() {
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create account"}
             </Button>
           </form>
-          <div className="my-4 flex items-center gap-3">
-            <div className="h-px flex-1 bg-border" />
-            <span className="text-xs text-muted-foreground">OR</span>
-            <div className="h-px flex-1 bg-border" />
-          </div>
-          <Button type="button" variant="outline" onClick={onGoogle} className="w-full h-11">
-            Continue with Google
-          </Button>
           <p className="mt-5 text-center text-sm text-muted-foreground">
             Already have an account? <Link to="/signin" search={{ redirect: "/dashboard" }} className="font-medium text-primary hover:underline">Sign in</Link>
           </p>
