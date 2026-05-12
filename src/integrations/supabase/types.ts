@@ -469,6 +469,7 @@ export type Database = {
         Args: { _make_moderator: boolean; _user_id: string }
         Returns: undefined
       }
+      apply_referral_code: { Args: { _ref_code: string }; Returns: Json }
       check_rate_limit: {
         Args: { _action: string; _max: number; _window: string }
         Returns: undefined

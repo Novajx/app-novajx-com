@@ -12,6 +12,8 @@ import { AppShell } from "@/components/AppShell";
 import { CoinIcon } from "@/components/CoinIcon";
 import { fmtNJX, fmtCountdown } from "@/lib/format";
 
+const REFERRAL_STORAGE_KEY = "novajx_pending_referral_code";
+
 export const Route = createFileRoute("/dashboard")({
   component: () => <RequireAuth><AppShell><Dashboard /></AppShell></RequireAuth>,
   head: () => ({ meta: [{ title: "Dashboard — NovaJX" }] }),
@@ -26,6 +28,31 @@ function Dashboard() {
     const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    const referralCode = localStorage.getItem(REFERRAL_STORAGE_KEY)?.trim();
+    if (!referralCode) return;
+
+    let cancelled = false;
+    const applyReferral = async () => {
+      const { data, error } = await supabase.rpc("apply_referral_code", { _ref_code: referralCode });
+      if (cancelled) return;
+      if (error) {
+        console.error("Failed to apply referral code", error);
+        return;
+      }
+      const result = data as { applied?: boolean; reason?: string } | null;
+      if (result?.applied || ["already_referred", "already_rewarded", "self_referral", "invalid_code"].includes(result?.reason ?? "")) {
+        localStorage.removeItem(REFERRAL_STORAGE_KEY);
+        qc.invalidateQueries({ queryKey: ["wallet"] });
+        qc.invalidateQueries({ queryKey: ["profile-dash", user.id] });
+      }
+    };
+
+    applyReferral();
+    return () => { cancelled = true; };
+  }, [user, qc]);
 
   const { data: wallet, isLoading: walletLoading } = useQuery({
     queryKey: ["wallet", user?.id],

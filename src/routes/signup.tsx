@@ -27,6 +27,7 @@ const schema = z.object({
   referral_code: z.string().trim().max(20).optional().or(z.literal("")),
 });
 type FormData = z.infer<typeof schema>;
+const REFERRAL_STORAGE_KEY = "novajx_pending_referral_code";
 
 export const Route = createFileRoute("/signup")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -42,12 +43,14 @@ function SignUpPage() {
   const { user, loading } = useAuth();
   const [submitting, setSubmitting] = useState(false);
 
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { referral_code: ref || "" },
   });
 
   const onGoogle = async () => {
+    const referralCode = watch("referral_code")?.trim();
+    if (referralCode) localStorage.setItem(REFERRAL_STORAGE_KEY, referralCode);
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: `${window.location.origin}/dashboard`,
     });
@@ -73,6 +76,7 @@ function SignUpPage() {
     });
     setSubmitting(false);
     if (error) { toast.error(error.message); return; }
+    localStorage.removeItem(REFERRAL_STORAGE_KEY);
     toast.success("Account created! Welcome to NovaJX.");
     navigate({ to: "/dashboard" });
   };
