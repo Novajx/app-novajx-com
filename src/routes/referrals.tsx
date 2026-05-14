@@ -48,12 +48,12 @@ function ReferralsPage() {
         supabase.from("referrals").select("total_bonus_earned").eq("referrer_id", user!.id),
       ]);
       const earned = (refs ?? []).reduce(
-        (s: number, r: any) => s + Number(r.total_bonus_earned ?? 0),
+        (s, r) => s + Number(r.total_bonus_earned ?? 0),
         0,
       );
       return {
         total: total ?? 0,
-        rnt: Number((wal as any)?.rnt_balance ?? 0),
+        rnt: Number(wal?.rnt_balance ?? 0),
         earned,
       };
     },
@@ -133,7 +133,9 @@ function ReferralsPage() {
           text: `Join NovaJX and earn digital credits. Use my code: ${code}`,
           url: link,
         });
-      } catch {}
+      } catch {
+        return;
+      }
     } else {
       copyLink();
     }
