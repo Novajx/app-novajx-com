@@ -47,10 +47,7 @@ function ReferralsPage() {
         supabase.from("wallets").select("rnt_balance").eq("user_id", user!.id).maybeSingle(),
         supabase.from("referrals").select("total_bonus_earned").eq("referrer_id", user!.id),
       ]);
-      const earned = (refs ?? []).reduce(
-        (s, r) => s + Number(r.total_bonus_earned ?? 0),
-        0,
-      );
+      const earned = (refs ?? []).reduce((s, r) => s + Number(r.total_bonus_earned ?? 0), 0);
       return {
         total: total ?? 0,
         rnt: Number(wal?.rnt_balance ?? 0),
