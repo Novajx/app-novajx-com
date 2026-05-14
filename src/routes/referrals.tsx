@@ -9,7 +9,13 @@ import { useAuth } from "@/lib/auth";
 import { fmtNJX } from "@/lib/format";
 
 export const Route = createFileRoute("/referrals")({
-  component: () => <RequireAuth><AppShell><ReferralsPage /></AppShell></RequireAuth>,
+  component: () => (
+    <RequireAuth>
+      <AppShell>
+        <ReferralsPage />
+      </AppShell>
+    </RequireAuth>
+  ),
   head: () => ({ meta: [{ title: "Invite Friends — NovaJX" }] }),
 });
 
@@ -19,7 +25,11 @@ function ReferralsPage() {
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("referral_code").eq("id", user!.id).single();
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("referral_code")
+        .eq("id", user!.id)
+        .single();
       if (error) throw error;
       return data;
     },
@@ -30,11 +40,17 @@ function ReferralsPage() {
     queryKey: ["ref-detail", user?.id],
     queryFn: async () => {
       const [{ count: total }, { data: wal }, { data: refs }] = await Promise.all([
-        supabase.from("referrals").select("*", { count: "exact", head: true }).eq("referrer_id", user!.id),
+        supabase
+          .from("referrals")
+          .select("*", { count: "exact", head: true })
+          .eq("referrer_id", user!.id),
         supabase.from("wallets").select("rnt_balance").eq("user_id", user!.id).maybeSingle(),
         supabase.from("referrals").select("total_bonus_earned").eq("referrer_id", user!.id),
       ]);
-      const earned = (refs ?? []).reduce((s: number, r: any) => s + Number(r.total_bonus_earned ?? 0), 0);
+      const earned = (refs ?? []).reduce(
+        (s: number, r: any) => s + Number(r.total_bonus_earned ?? 0),
+        0,
+      );
       return {
         total: total ?? 0,
         rnt: Number((wal as any)?.rnt_balance ?? 0),
@@ -66,12 +82,42 @@ function ReferralsPage() {
   const shareText = `Join NovaJX and start earning digital credits. Use my code ${code}:`;
   const enc = encodeURIComponent;
   const shareTargets = [
-    { name: "WhatsApp", icon: MessageCircle, color: "bg-[#25D366]", href: `https://wa.me/?text=${enc(`${shareText} ${link}`)}` },
-    { name: "Telegram", icon: Send, color: "bg-[#229ED9]", href: `https://t.me/share/url?url=${enc(link)}&text=${enc(shareText)}` },
-    { name: "Facebook", icon: Share2, color: "bg-[#1877F2]", href: `https://www.facebook.com/sharer/sharer.php?u=${enc(link)}&quote=${enc(shareText)}` },
-    { name: "X / Twitter", icon: Send, color: "bg-black", href: `https://twitter.com/intent/tweet?text=${enc(shareText)}&url=${enc(link)}` },
-    { name: "LinkedIn", icon: Share2, color: "bg-[#0A66C2]", href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(link)}` },
-    { name: "Email", icon: Mail, color: "bg-muted-foreground", href: `mailto:?subject=${enc("Join me on NovaJX")}&body=${enc(`${shareText}\n\n${link}`)}` },
+    {
+      name: "WhatsApp",
+      icon: MessageCircle,
+      color: "bg-[#25D366]",
+      href: `https://wa.me/?text=${enc(`${shareText} ${link}`)}`,
+    },
+    {
+      name: "Telegram",
+      icon: Send,
+      color: "bg-[#229ED9]",
+      href: `https://t.me/share/url?url=${enc(link)}&text=${enc(shareText)}`,
+    },
+    {
+      name: "Facebook",
+      icon: Share2,
+      color: "bg-[#1877F2]",
+      href: `https://www.facebook.com/sharer/sharer.php?u=${enc(link)}&quote=${enc(shareText)}`,
+    },
+    {
+      name: "X / Twitter",
+      icon: Send,
+      color: "bg-black",
+      href: `https://twitter.com/intent/tweet?text=${enc(shareText)}&url=${enc(link)}`,
+    },
+    {
+      name: "LinkedIn",
+      icon: Share2,
+      color: "bg-[#0A66C2]",
+      href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(link)}`,
+    },
+    {
+      name: "Email",
+      icon: Mail,
+      color: "bg-muted-foreground",
+      href: `mailto:?subject=${enc("Join me on NovaJX")}&body=${enc(`${shareText}\n\n${link}`)}`,
+    },
   ];
 
   const copyLink = () => {
@@ -82,14 +128,23 @@ function ReferralsPage() {
   const shareLink = async () => {
     if (navigator.share) {
       try {
-        await navigator.share({ title: "Join NovaJX", text: `Join NovaJX and earn digital credits. Use my code: ${code}`, url: link });
+        await navigator.share({
+          title: "Join NovaJX",
+          text: `Join NovaJX and earn digital credits. Use my code: ${code}`,
+          url: link,
+        });
       } catch {}
     } else {
       copyLink();
     }
   };
 
-  if (isLoading) return <div className="flex h-64 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  if (isLoading)
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
 
   return (
     <div className="space-y-5">
@@ -100,7 +155,9 @@ function ReferralsPage() {
           <p className="text-sm font-medium opacity-90">Earn 1 RNT per successful invite</p>
         </div>
         <h1 className="mt-2 font-display text-3xl font-bold">Invite & Earn Rewards</h1>
-        <p className="mt-1 text-sm opacity-80">Share NovaJX with friends and grow your RNT balance.</p>
+        <p className="mt-1 text-sm opacity-80">
+          Share NovaJX with friends and grow your RNT balance.
+        </p>
 
         <div className="mt-5 rounded-2xl bg-white/15 p-3 backdrop-blur">
           <p className="text-xs opacity-80">Your referral code</p>
@@ -108,10 +165,16 @@ function ReferralsPage() {
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <button onClick={copyLink} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-primary/35 bg-background px-4 py-3 text-sm font-bold text-foreground shadow-soft transition-smooth hover:bg-secondary">
+          <button
+            onClick={copyLink}
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-primary/35 bg-background px-4 py-3 text-sm font-bold text-foreground shadow-soft transition-smooth hover:bg-secondary"
+          >
             <Copy className="h-4 w-4" /> Copy link
           </button>
-          <button onClick={shareLink} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-primary/35 bg-background px-4 py-3 text-sm font-bold text-foreground shadow-soft transition-smooth hover:bg-secondary">
+          <button
+            onClick={shareLink}
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-primary/35 bg-background px-4 py-3 text-sm font-bold text-foreground shadow-soft transition-smooth hover:bg-secondary"
+          >
             <Share2 className="h-4 w-4" /> Invite Friends
           </button>
         </div>
@@ -129,7 +192,9 @@ function ReferralsPage() {
       {/* Social share */}
       <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
         <h2 className="font-display text-lg font-bold">Share on social</h2>
-        <p className="mt-1 text-xs text-muted-foreground">Tap a platform to invite friends instantly.</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Tap a platform to invite friends instantly.
+        </p>
         <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-6">
           {shareTargets.map((s) => (
             <a
@@ -139,7 +204,9 @@ function ReferralsPage() {
               rel="noopener noreferrer"
               className="flex flex-col items-center gap-2 rounded-2xl border border-border/60 p-3 transition-smooth hover:border-primary/60 hover:bg-accent"
             >
-              <span className={`flex h-11 w-11 items-center justify-center rounded-full text-white ${s.color}`}>
+              <span
+                className={`flex h-11 w-11 items-center justify-center rounded-full text-white ${s.color}`}
+              >
                 <s.icon className="h-5 w-5" />
               </span>
               <span className="text-[11px] font-medium">{s.name}</span>
@@ -176,7 +243,15 @@ function ReferralsPage() {
   );
 }
 
-function Stat({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string | number }) {
+function Stat({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string | number;
+}) {
   return (
     <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-soft">
       <Icon className="h-4 w-4 text-primary" />
