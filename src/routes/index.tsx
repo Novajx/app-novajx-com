@@ -62,9 +62,6 @@ function Landing() {
           <Button asChild size="lg" className="h-12 w-full gap-2 bg-gradient-primary px-8 text-primary-foreground shadow-elegant sm:w-auto">
             <Link to="/signup" search={{ ref: "" }}>Start collecting free <ArrowRight className="h-4 w-4" /></Link>
           </Button>
-          <Button asChild size="lg" variant="ghost" className="h-12 w-full px-8 text-foreground hover:bg-primary/10 sm:w-auto">
-            <Link to="/leaderboard">View leaderboard</Link>
-          </Button>
         </div>
 
         <div className="mt-16 flex justify-center sm:mt-20">
