@@ -108,6 +108,9 @@ function ReferralsPage() {
         </div>
 
         <div className="mt-3 flex gap-2">
+          <button onClick={copyLink} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-white py-2.5 text-sm font-semibold text-primary transition-smooth hover:bg-white/90">
+            <Copy className="h-4 w-4" /> Copy link
+          </button>
           <button onClick={shareLink} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-white py-2.5 text-sm font-semibold text-primary transition-smooth hover:bg-white/90">
             <Share2 className="h-4 w-4" /> Invite Friends
           </button>
