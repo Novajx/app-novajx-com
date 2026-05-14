@@ -107,11 +107,11 @@ function ReferralsPage() {
           <p className="mt-1 font-mono text-2xl font-bold tracking-widest">{code}</p>
         </div>
 
-        <div className="mt-3 flex gap-2">
-          <button onClick={copyLink} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-white py-2.5 text-sm font-semibold text-primary transition-smooth hover:bg-white/90">
+        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <button onClick={copyLink} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-primary/35 bg-background px-4 py-3 text-sm font-bold text-foreground shadow-soft transition-smooth hover:bg-secondary">
             <Copy className="h-4 w-4" /> Copy link
           </button>
-          <button onClick={shareLink} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-white py-2.5 text-sm font-semibold text-primary transition-smooth hover:bg-white/90">
+          <button onClick={shareLink} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-primary/35 bg-background px-4 py-3 text-sm font-bold text-foreground shadow-soft transition-smooth hover:bg-secondary">
             <Share2 className="h-4 w-4" /> Invite Friends
           </button>
         </div>
