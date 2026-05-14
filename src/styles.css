@@ -119,9 +119,14 @@
 
 @layer base {
   * { border-color: var(--color-border); }
+  html, body {
+    background-color: var(--color-background);
+    background: var(--gradient-hero);
+    background-attachment: fixed;
+    min-height: 100%;
+  }
   html { font-family: var(--font-sans); }
   body {
-    background-color: var(--color-background);
     color: var(--color-foreground);
     font-feature-settings: "cv11", "ss01";
     -webkit-font-smoothing: antialiased;
