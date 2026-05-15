@@ -43,7 +43,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="mx-auto flex max-w-5xl items-center justify-around px-2 py-2">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const active = location.pathname.startsWith(item.to);
+            const active =
+              location.pathname === item.to ||
+              location.pathname.startsWith(`${item.to}/`);
             return (
               <Link
                 key={item.to}
