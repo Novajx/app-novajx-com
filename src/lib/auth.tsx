@@ -28,6 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isModerator, setIsModerator] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [rolesLoaded, setRolesLoaded] = useState(false);
 
   useEffect(() => {
     // Listener BEFORE getSession (proper pattern)
@@ -36,6 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(sess);
         setUser(sess?.user ?? null);
         if (sess?.user) {
+          setRolesLoaded(false);
           // defer to avoid deadlock
           setTimeout(async () => {
             const { data } = await supabase
@@ -44,10 +46,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               .eq("user_id", sess.user.id);
             setIsAdmin(!!data?.some((r) => r.role === "admin"));
             setIsModerator(!!data?.some((r) => (r.role as string) === "moderator"));
+            setRolesLoaded(true);
           }, 0);
         } else {
           setIsAdmin(false);
           setIsModerator(false);
+          setRolesLoaded(true);
         }
       }
     );
@@ -55,6 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(({ data: { session: sess } }) => {
       setSession(sess);
       setUser(sess?.user ?? null);
+      if (!sess?.user) setRolesLoaded(true);
       setLoading(false);
     });
 
@@ -67,10 +72,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setIsAdmin(false);
     setIsModerator(false);
+    setRolesLoaded(true);
   };
 
   return (
-    <AuthCtx.Provider value={{ user, session, isAdmin, isModerator, isStaff: isAdmin || isModerator, loading, signOut }}>
+    <AuthCtx.Provider value={{ user, session, isAdmin, isModerator, isStaff: isAdmin || isModerator, loading: loading || (!!user && !rolesLoaded), signOut }}>
       {children}
     </AuthCtx.Provider>
   );
