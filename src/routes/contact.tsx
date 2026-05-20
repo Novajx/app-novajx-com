@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { MarketingShell } from "@/components/MarketingShell";
-import { Mail, MessageCircle, Twitter, Send } from "lucide-react";
+import { Mail, MessageCircle, Send, AtSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -34,7 +34,7 @@ function ContactPage() {
           {[
             { icon: Mail, label: "Email", value: "hello@novajx.com", href: "mailto:hello@novajx.com" },
             { icon: MessageCircle, label: "Telegram", value: "@novajx", href: "https://t.me/novajx" },
-            { icon: Twitter, label: "Twitter / X", value: "@novajx", href: "https://x.com/novajx" },
+            { icon: AtSign, label: "Twitter / X", value: "@novajx", href: "https://x.com/novajx" },
           ].map((c) => (
             <a key={c.label} href={c.href} className="flex items-center gap-4 rounded-2xl border border-border/60 bg-card/60 p-4 backdrop-blur-sm transition-smooth hover:border-primary/40">
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground">
