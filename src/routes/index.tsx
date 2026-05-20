@@ -3,7 +3,7 @@ import { Gift, Users, Trophy, ShieldCheck, ArrowRight, Sparkles, Download, Cpu, 
 import { Button } from "@/components/ui/button";
 import { CoinIcon } from "@/components/CoinIcon";
 import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { MarketingShell } from "@/components/MarketingShell";
 
 export const Route = createFileRoute("/")({
@@ -18,9 +18,13 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
-  show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 0.7, delay: i * 0.08, ease: [0.2, 0.8, 0.2, 1] } }),
+  show: (i: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, delay: i * 0.08, ease: "easeOut" },
+  }),
 };
 
 function Landing() {
