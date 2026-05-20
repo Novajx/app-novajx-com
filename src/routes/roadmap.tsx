@@ -17,7 +17,7 @@ export const Route = createFileRoute("/roadmap")({
 const PHASES = [
   { q: "Q1 2024", title: "Genesis", done: true, items: ["Private beta launch", "First 10k collectors", "Wallet v1"] },
   { q: "Q3 2024", title: "Liftoff", done: true, items: ["Public launch", "Referral RNT", "Manual KYC"] },
-  { q: "Q2 2026", title: "AI Mining", done: false, items: ["Adaptive AI engine", "Live leaderboards", "Mobile app v2"] },
+  { q: "Q2 2026", title: "Mining", done: false, items: ["Adaptive engine", "Live leaderboards", "Mobile app v2"] },
   { q: "Q4 2026", title: "Mainnet", done: false, items: ["Public mainnet", "Token bridging", "On-app governance"] },
   { q: "2027+", title: "Beyond", done: false, items: ["Merchant network", "Global payouts", "1B+ users"] },
 ];

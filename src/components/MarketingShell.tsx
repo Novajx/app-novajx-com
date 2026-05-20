@@ -7,7 +7,7 @@ import logo from "@/assets/novajx-mark.png";
 const NAV = [
   { to: "/about", label: "About" },
   { to: "/features", label: "Features" },
-  { to: "/ai-mining", label: "AI Mining" },
+  { to: "/ai-mining", label: "Mining" },
   { to: "/security", label: "Security" },
   { to: "/roadmap", label: "Roadmap" },
   { to: "/tokenomics", label: "Tokenomics" },
@@ -156,7 +156,7 @@ export function MarketingFooter() {
           </div>
           <p className="mt-3 text-xs text-muted-foreground">Next-gen mobile digital rewards. Mine NJX daily, anywhere.</p>
         </div>
-        <FooterCol title="Product" links={[["/features","Features"],["/ai-mining","AI Mining"],["/tokenomics","Tokenomics"],["/roadmap","Roadmap"]]} />
+        <FooterCol title="Product" links={[["/features","Features"],["/ai-mining","Mining"],["/tokenomics","Tokenomics"],["/roadmap","Roadmap"]]} />
         <FooterCol title="Company" links={[["/about","About"],["/security","Security"],["/contact","Contact"],["/faq","FAQ"]]} />
         <FooterCol title="Account" links={[["/signin","Sign in"],["/signup","Get started"]]} />
       </div>

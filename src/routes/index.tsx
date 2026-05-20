@@ -9,10 +9,11 @@ import { MarketingShell } from "@/components/MarketingShell";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "NovaJX — Next-Gen AI Crypto, Mined From Your Phone" },
-      { name: "description", content: "NovaJX is a next-generation AI-powered mobile crypto network. Mine NJX daily with a single tap — no rigs, no fees, no hardware." },
-      { property: "og:title", content: "NovaJX — Next-Gen AI Crypto" },
-      { property: "og:description", content: "An AI-distributed mobile crypto network. Mine NJX daily, anywhere." },
+      { title: "NovaJX — Next-Gen Crypto, Mined From Your Phone" },
+      { name: "description", content: "NovaJX is a next-generation mobile crypto network. Mine NJX daily with a single tap — no rigs, no fees, no hardware." },
+      { property: "og:title", content: "NovaJX — Next-Gen Crypto" },
+      { property: "og:description", content: "A mobile-distributed crypto network. Mine NJX daily, anywhere." },
+
     ],
   }),
   component: Landing,
@@ -61,7 +62,7 @@ function Hero() {
             custom={1}
             className="mt-6 text-4xl font-bold leading-[1.02] tracking-tight sm:text-6xl xl:text-7xl"
           >
-            The next-gen <span className="text-shine">AI crypto</span> network, mined from your phone.
+            The next-gen <span className="text-shine">mobile crypto</span> network, mined from your phone.
           </motion.h1>
 
           <motion.p
@@ -71,7 +72,7 @@ function Hero() {
             custom={2}
             className="mx-auto mt-5 max-w-xl text-base text-muted-foreground sm:text-lg lg:mx-0"
           >
-            NovaJX runs an adaptive AI engine that distributes NJX fairly across millions of devices. No rigs. No fees. One tap a day.
+            NovaJX runs an adaptive engine that distributes NJX fairly across millions of devices. No rigs. No fees. One tap a day.
           </motion.p>
 
           <motion.div
@@ -114,7 +115,7 @@ function Hero() {
           className="relative mx-auto w-full max-w-md"
         >
           <HeroCoin />
-          <FloatingCard className="absolute -left-2 top-6 sm:-left-6" icon={Brain} title="AI epoch" value="#1,284" sub="adaptive" delay={0.3} />
+          <FloatingCard className="absolute -left-2 top-6 sm:-left-6" icon={Brain} title="Epoch" value="#1,284" sub="adaptive" delay={0.3} />
           <FloatingCard className="absolute -right-2 top-1/3 sm:-right-6" icon={Cpu} title="Hashrate" value="842 TH/s" sub="live" delay={0.55} />
           <FloatingCard className="absolute bottom-4 left-1/2 -translate-x-1/2" icon={Lock} title="Secured" value="Zero-knowledge" sub="audited" delay={0.8} />
           {!reduce && <MiningStats />}
@@ -173,7 +174,7 @@ function FloatingCard({ className = "", icon: Icon, title, value, sub, delay = 0
 }
 
 const FEATURES = [
-  { icon: Brain, title: "Adaptive AI engine", desc: "Onboard models tune claim difficulty in real time to keep distribution fair." },
+  { icon: Brain, title: "Adaptive engine", desc: "Onboard models tune claim difficulty in real time to keep distribution fair." },
   { icon: Cpu, title: "Zero hardware", desc: "Less than 1% battery per claim. No rigs, no fans, no e-waste." },
   { icon: Lock, title: "Zero-knowledge security", desc: "Audited signatures, on-device key custody, KYC behind ZK proofs." },
   { icon: Globe2, title: "Global throughput", desc: "180+ countries. Offline-tolerant claims sync the moment you reconnect." },
@@ -189,7 +190,7 @@ function FeatureGrid() {
           <Sparkles className="h-3 w-3" /> Capabilities
         </div>
         <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-5xl">Enterprise-grade. Mobile-native.</h2>
-        <p className="mt-3 text-muted-foreground">A full crypto stack — distributed by AI, designed for the next billion users.</p>
+        <p className="mt-3 text-muted-foreground">A full crypto stack — distributed globally, designed for the next billion users.</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {FEATURES.map((f, i) => (
@@ -217,7 +218,7 @@ function HowItWorks() {
   const steps = [
     { icon: Download, title: "Download NovaJX", desc: "Install the app on Android in seconds. iOS coming soon." },
     { icon: ShieldCheck, title: "Verify with one tap", desc: "Lightweight KYC keeps the network honest — no spreadsheets." },
-    { icon: Cpu, title: "Claim daily NJX", desc: "Open the app. Tap. Our AI engine credits your wallet instantly." },
+    { icon: Cpu, title: "Claim daily NJX", desc: "Open the app. Tap. Our engine credits your wallet instantly." },
     { icon: Users, title: "Invite & earn RNT", desc: "Get 1 RNT for every verified friend. Compounds forever." },
   ];
   return (
@@ -252,7 +253,7 @@ function HowItWorks() {
 }
 
 function PartnerMarquee() {
-  const items = ["AI · COMPUTE", "ZERO-KNOWLEDGE", "MOBILE-NATIVE", "EDGE INFERENCE", "ADAPTIVE PoW", "180+ COUNTRIES", "AUDITED", "OPEN PROTOCOL"];
+  const items = ["EDGE · COMPUTE", "ZERO-KNOWLEDGE", "MOBILE-NATIVE", "EDGE INFERENCE", "ADAPTIVE PoW", "180+ COUNTRIES", "AUDITED", "OPEN PROTOCOL"];
   const row = [...items, ...items];
   return (
     <section className="relative z-10 mx-auto mb-10 max-w-7xl px-4 sm:px-6">
@@ -281,7 +282,7 @@ function FinalCTA() {
               <Link to="/signup" search={{ ref: "" }}>Create free account</Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="h-12 border-primary/40 px-8 backdrop-blur-sm">
-              <Link to="/ai-mining">How AI mining works</Link>
+              <Link to="/ai-mining">How mining works</Link>
             </Button>
           </div>
         </div>

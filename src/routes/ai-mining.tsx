@@ -7,10 +7,10 @@ import { useEffect, useState } from "react";
 export const Route = createFileRoute("/ai-mining")({
   head: () => ({
     meta: [
-      { title: "AI Mining — NovaJX" },
-      { name: "description", content: "How NovaJX uses adaptive AI to distribute NJX fairly and efficiently across millions of mobile devices." },
-      { property: "og:title", content: "NovaJX AI Mining" },
-      { property: "og:description", content: "Adaptive AI mining engine for fair, low-energy daily distribution." },
+      { title: "Mining — NovaJX" },
+      { name: "description", content: "How NovaJX uses an adaptive engine to distribute NJX fairly and efficiently across millions of mobile devices." },
+      { property: "og:title", content: "NovaJX Mining" },
+      { property: "og:description", content: "Adaptive mining engine for fair, low-energy daily distribution." },
     ],
   }),
   component: AIMiningPage,
@@ -23,20 +23,21 @@ function AIMiningPage() {
     return () => clearInterval(id);
   }, []);
   const stats = [
-    { icon: Cpu, label: "AI Hashrate", value: `${(842 + (tick % 9) * 1.3).toFixed(2)} TH/s` },
+    { icon: Cpu, label: "Hashrate", value: `${(842 + (tick % 9) * 1.3).toFixed(2)} TH/s` },
     { icon: Activity, label: "Active miners", value: (128_447 + tick).toLocaleString() },
-    { icon: Layers, label: "AI epochs", value: `${1240 + Math.floor(tick / 4)}` },
+    { icon: Layers, label: "Epochs", value: `${1240 + Math.floor(tick / 4)}` },
   ];
   const steps = [
-    { icon: Brain, title: "Adaptive model", desc: "An onboard AI model tunes claim difficulty to keep distribution fair across devices." },
+    { icon: Brain, title: "Adaptive model", desc: "An onboard model tunes claim difficulty to keep distribution fair across devices." },
     { icon: Zap, title: "Light & low-energy", desc: "Less than 1% battery per claim. No fans, no heat, no e-waste." },
     { icon: Cpu, title: "Verifiable rewards", desc: "Each claim is signed, audited and traceable across the network." },
   ];
   return (
     <MarketingShell>
       <section className="mx-auto max-w-4xl px-4 pt-12 pb-10 text-center sm:px-6 sm:pt-20">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">AI mining, in your pocket</h1>
-        <p className="mx-auto mt-4 max-w-2xl text-muted-foreground sm:text-lg">NovaJX runs an adaptive AI engine that distributes NJX fairly across phones — no rigs, no waste.</p>
+        <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">Mining, in your pocket</h1>
+        <p className="mx-auto mt-4 max-w-2xl text-muted-foreground sm:text-lg">NovaJX runs an adaptive engine that distributes NJX fairly across phones — no rigs, no waste.</p>
+
       </section>
       <section className="mx-auto mb-12 grid max-w-4xl gap-3 px-4 sm:grid-cols-3 sm:px-6">
         {stats.map((s) => (
