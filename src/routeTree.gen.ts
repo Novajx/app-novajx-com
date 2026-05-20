@@ -10,16 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WalletRouteImport } from './routes/wallet'
+import { Route as TokenomicsRouteImport } from './routes/tokenomics'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SigninRouteImport } from './routes/signin'
+import { Route as SecurityRouteImport } from './routes/security'
+import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ReferralsRouteImport } from './routes/referrals'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as KycRouteImport } from './routes/kyc'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as FeaturesRouteImport } from './routes/features'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AiMiningRouteImport } from './routes/ai-mining'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -27,6 +34,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const WalletRoute = WalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TokenomicsRoute = TokenomicsRouteImport.update({
+  id: '/tokenomics',
+  path: '/tokenomics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -42,6 +54,16 @@ const SignupRoute = SignupRouteImport.update({
 const SigninRoute = SigninRouteImport.update({
   id: '/signin',
   path: '/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SecurityRoute = SecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoadmapRoute = RoadmapRouteImport.update({
+  id: '/roadmap',
+  path: '/roadmap',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -74,9 +96,29 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeaturesRoute = FeaturesRouteImport.update({
+  id: '/features',
+  path: '/features',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiMiningRoute = AiMiningRouteImport.update({
+  id: '/ai-mining',
+  path: '/ai-mining',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -99,32 +141,46 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/ai-mining': typeof AiMiningRoute
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/faq': typeof FaqRoute
+  '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/kyc': typeof KycRoute
   '/leaderboard': typeof LeaderboardRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/roadmap': typeof RoadmapRoute
+  '/security': typeof SecurityRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
+  '/tokenomics': typeof TokenomicsRoute
   '/wallet': typeof WalletRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/ai-mining': typeof AiMiningRoute
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/faq': typeof FaqRoute
+  '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/kyc': typeof KycRoute
   '/leaderboard': typeof LeaderboardRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/roadmap': typeof RoadmapRoute
+  '/security': typeof SecurityRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
+  '/tokenomics': typeof TokenomicsRoute
   '/wallet': typeof WalletRoute
 }
 export interface FileRoutesById {
@@ -132,16 +188,23 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/ai-mining': typeof AiMiningRoute
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/faq': typeof FaqRoute
+  '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/kyc': typeof KycRoute
   '/leaderboard': typeof LeaderboardRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/roadmap': typeof RoadmapRoute
+  '/security': typeof SecurityRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
+  '/tokenomics': typeof TokenomicsRoute
   '/wallet': typeof WalletRoute
 }
 export interface FileRouteTypes {
@@ -150,48 +213,69 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/ai-mining'
+    | '/contact'
     | '/dashboard'
+    | '/faq'
+    | '/features'
     | '/forgot-password'
     | '/kyc'
     | '/leaderboard'
     | '/profile'
     | '/referrals'
     | '/reset-password'
+    | '/roadmap'
+    | '/security'
     | '/signin'
     | '/signup'
     | '/terms'
+    | '/tokenomics'
     | '/wallet'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/admin'
+    | '/ai-mining'
+    | '/contact'
     | '/dashboard'
+    | '/faq'
+    | '/features'
     | '/forgot-password'
     | '/kyc'
     | '/leaderboard'
     | '/profile'
     | '/referrals'
     | '/reset-password'
+    | '/roadmap'
+    | '/security'
     | '/signin'
     | '/signup'
     | '/terms'
+    | '/tokenomics'
     | '/wallet'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/admin'
+    | '/ai-mining'
+    | '/contact'
     | '/dashboard'
+    | '/faq'
+    | '/features'
     | '/forgot-password'
     | '/kyc'
     | '/leaderboard'
     | '/profile'
     | '/referrals'
     | '/reset-password'
+    | '/roadmap'
+    | '/security'
     | '/signin'
     | '/signup'
     | '/terms'
+    | '/tokenomics'
     | '/wallet'
   fileRoutesById: FileRoutesById
 }
@@ -199,16 +283,23 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
+  AiMiningRoute: typeof AiMiningRoute
+  ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
+  FaqRoute: typeof FaqRoute
+  FeaturesRoute: typeof FeaturesRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   KycRoute: typeof KycRoute
   LeaderboardRoute: typeof LeaderboardRoute
   ProfileRoute: typeof ProfileRoute
   ReferralsRoute: typeof ReferralsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  RoadmapRoute: typeof RoadmapRoute
+  SecurityRoute: typeof SecurityRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
   TermsRoute: typeof TermsRoute
+  TokenomicsRoute: typeof TokenomicsRoute
   WalletRoute: typeof WalletRoute
 }
 
@@ -219,6 +310,13 @@ declare module '@tanstack/react-router' {
       path: '/wallet'
       fullPath: '/wallet'
       preLoaderRoute: typeof WalletRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tokenomics': {
+      id: '/tokenomics'
+      path: '/tokenomics'
+      fullPath: '/tokenomics'
+      preLoaderRoute: typeof TokenomicsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -240,6 +338,20 @@ declare module '@tanstack/react-router' {
       path: '/signin'
       fullPath: '/signin'
       preLoaderRoute: typeof SigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/security': {
+      id: '/security'
+      path: '/security'
+      fullPath: '/security'
+      preLoaderRoute: typeof SecurityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/roadmap': {
+      id: '/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof RoadmapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -284,11 +396,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/features': {
+      id: '/features'
+      path: '/features'
+      fullPath: '/features'
+      preLoaderRoute: typeof FeaturesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-mining': {
+      id: '/ai-mining'
+      path: '/ai-mining'
+      fullPath: '/ai-mining'
+      preLoaderRoute: typeof AiMiningRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -319,18 +459,34 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
+  AiMiningRoute: AiMiningRoute,
+  ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
+  FaqRoute: FaqRoute,
+  FeaturesRoute: FeaturesRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   KycRoute: KycRoute,
   LeaderboardRoute: LeaderboardRoute,
   ProfileRoute: ProfileRoute,
   ReferralsRoute: ReferralsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  RoadmapRoute: RoadmapRoute,
+  SecurityRoute: SecurityRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
   TermsRoute: TermsRoute,
+  TokenomicsRoute: TokenomicsRoute,
   WalletRoute: WalletRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
