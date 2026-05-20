@@ -50,14 +50,9 @@ function Hero() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-medium text-primary backdrop-blur-sm"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
-            </span>
-            AI-distributed · Mainnet Q2 · Claim 2 NJX / 24h
-          </motion.div>
+            className="hidden"
+          />
+
 
           <motion.h1
             variants={fadeUp}
@@ -88,7 +83,7 @@ function Hero() {
           >
             <Button asChild size="lg" className="group relative h-12 w-full gap-2 overflow-hidden bg-gradient-primary px-8 text-primary-foreground shadow-elegant animate-pulse-glow sm:w-auto">
               <Link to="/signup" search={{ ref: "" }}>
-                <span className="relative z-10 flex items-center gap-2">Launch app <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></span>
+                <span className="relative z-10 flex items-center gap-2">Register <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></span>
                 <span className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-beam" />
               </Link>
             </Button>
