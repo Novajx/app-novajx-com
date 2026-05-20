@@ -16,7 +16,7 @@ export const Route = createFileRoute("/faq")({
 
 const ITEMS: [string, string][] = [
   ["Is NovaJX free?", "Yes. Creating an account and claiming your daily NJX is completely free — no purchase or hardware needed."],
-  ["How does mining work?", "Tap once every 24 hours to claim 2 NJX. The AI engine handles fair distribution across the network."],
+  ["How does mining work?", "Tap once every 24 hours to claim 2 NJX. The engine handles fair distribution across the network."],
   ["Do I need KYC?", "KYC is required to withdraw or transfer larger balances. It's a quick manual review process."],
   ["How are referrals rewarded?", "You earn 1 RNT for every friend who joins using your referral code and completes signup."],
   ["Is NJX a cryptocurrency?", "NJX is a digital reward credit used inside the NovaJX network. Mainnet bridging is on the roadmap."],
