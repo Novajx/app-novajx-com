@@ -1,208 +1,317 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Gift, Users, Trophy, ShieldCheck, ArrowRight, Sparkles, Download, Cpu, Zap, Activity, TrendingUp, TrendingDown } from "lucide-react";
+import { Gift, Users, Trophy, ShieldCheck, ArrowRight, Sparkles, Download, Cpu, Zap, Activity, TrendingUp, TrendingDown, Brain, Lock, Globe2, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/novajx-mark.png";
 import { CoinIcon } from "@/components/CoinIcon";
 import { useEffect, useState } from "react";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { MarketingShell } from "@/components/MarketingShell";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "NovaJX — Collect Daily Rewards | Earn Digital Credits" },
-      { name: "description", content: "Join NovaJX and collect daily NJX rewards. Invite friends and earn RNT referral tokens. Secure KYC verification." },
+      { title: "NovaJX — Next-Gen AI Crypto, Mined From Your Phone" },
+      { name: "description", content: "NovaJX is a next-generation AI-powered mobile crypto network. Mine NJX daily with a single tap — no rigs, no fees, no hardware." },
+      { property: "og:title", content: "NovaJX — Next-Gen AI Crypto" },
+      { property: "og:description", content: "An AI-distributed mobile crypto network. Mine NJX daily, anywhere." },
     ],
   }),
   component: Landing,
 });
 
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  show: (i: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, delay: i * 0.08, ease: "easeOut" },
+  }),
+};
+
 function Landing() {
   return (
-    <div className="min-h-screen bg-gradient-hero">
-      <XRBackground />
-      <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
-        <Link to="/" className="flex items-center gap-2.5">
-          <span className="relative inline-flex h-9 w-9 items-center justify-center">
-            <span className="absolute inset-0 animate-logo-spin rounded-full border border-primary/40" />
-            <span className="absolute inset-[-4px] animate-logo-spin-rev rounded-full border border-primary/20" />
-            <img src={logo} alt="NovaJX" width={28} height={28} className="relative h-7 w-7 object-contain drop-shadow-[0_0_8px_oklch(0.92_0.18_92/0.6)]" />
-          </span>
-          <span className="font-display text-lg font-bold tracking-tight sm:text-xl">NovaJX</span>
-        </Link>
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          <Button asChild size="sm" variant="outline" className="gap-1.5">
-            <a href="/downloads/NovaJX.apk" download>
-              <Download className="h-4 w-4" />
-              <span className="hidden sm:inline">Download App</span>
-              <span className="sm:hidden">App</span>
-            </a>
-          </Button>
-          <Button asChild variant="ghost" size="sm">
-            <Link to="/signin" search={{ redirect: "/dashboard" }}>Sign in</Link>
-          </Button>
-          <Button asChild size="sm" className="bg-gradient-primary text-primary-foreground shadow-elegant">
-            <Link to="/signup" search={{ ref: "" }}>Get started</Link>
-          </Button>
-        </div>
-      </header>
-
-      <section className="relative z-10 mx-auto max-w-5xl px-4 pt-10 pb-16 text-center sm:px-6 sm:pt-16 sm:pb-20">
-        <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-medium text-primary backdrop-blur-sm">
-          <Sparkles className="h-3.5 w-3.5" /> Claim 2 NJX every 24 hours
-        </div>
-
-        <h1 className="mx-auto mt-7 max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
-          Earn digital credits,{" "}
-          <span
-            className="bg-gradient-gold bg-clip-text"
-            style={{ WebkitTextFillColor: "transparent", WebkitBackgroundClip: "text" }}
-          >
-            from your phone
-          </span>
-        </h1>
-
-        <p className="mx-auto mt-6 max-w-xl text-base text-muted-foreground sm:text-lg">
-          NovaJX is a digital rewards platform. Collect 2 NJX every 24 hours — one tap a day, no hardware, no fees.
-        </p>
-
-        <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Button asChild size="lg" className="h-12 w-full gap-2 bg-gradient-primary px-8 text-primary-foreground shadow-elegant sm:w-auto">
-            <Link to="/signup" search={{ ref: "" }}>Start collecting free <ArrowRight className="h-4 w-4" /></Link>
-          </Button>
-          <Button asChild size="lg" variant="outline" className="h-12 w-full gap-2 border-primary/40 px-8 backdrop-blur-sm sm:w-auto">
-            <a href="/downloads/NovaJX.apk" download>
-              <Download className="h-4 w-4" /> Download App
-            </a>
-          </Button>
-        </div>
-
-        <HeroCoin />
-
-        <MiningStats />
-      </section>
-
+    <MarketingShell>
+      <Hero />
       <LivePrices />
+      <PartnerMarquee />
+      <FeatureGrid />
+      <HowItWorks />
+      <FinalCTA />
+    </MarketingShell>
+  );
+}
 
-      <section className="relative z-10 mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-        <div className="grid gap-4 sm:gap-5 md:grid-cols-3">
-          {[
-            { icon: Gift, title: "One-tap rewards", desc: "Collect 2 NJX every 24 hours. No effort, no battery drain." },
-            { icon: Users, title: "Invite & earn RNT", desc: "Get 1 RNT for every friend who joins with your code." },
-            { icon: ShieldCheck, title: "KYC secure", desc: "Manual KYC review for verified accounts. Your account, protected." },
-          ].map((f) => (
-            <div
-              key={f.title}
-              className="rounded-2xl border border-border/60 bg-card/60 p-6 shadow-soft backdrop-blur-sm transition-smooth hover:border-primary/30 hover:shadow-elegant"
-            >
-              <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground">
-                <f.icon className="h-5 w-5" />
-              </div>
-              <h3 className="font-display text-lg font-semibold">{f.title}</h3>
-              <p className="mt-1.5 text-sm text-muted-foreground">{f.desc}</p>
-            </div>
-          ))}
+function Hero() {
+  const reduce = useReducedMotion();
+  return (
+    <section className="relative mx-auto max-w-7xl px-4 pt-10 pb-16 sm:px-6 sm:pt-16 sm:pb-20">
+      <div className="grid items-center gap-10 lg:grid-cols-2">
+        <div className="text-center lg:text-left">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-medium text-primary backdrop-blur-sm"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+            </span>
+            AI-distributed · Mainnet Q2 · Claim 2 NJX / 24h
+          </motion.div>
+
+          <motion.h1
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            custom={1}
+            className="mt-6 text-4xl font-bold leading-[1.02] tracking-tight sm:text-6xl xl:text-7xl"
+          >
+            The next-gen <span className="text-shine">AI crypto</span> network, mined from your phone.
+          </motion.h1>
+
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            custom={2}
+            className="mx-auto mt-5 max-w-xl text-base text-muted-foreground sm:text-lg lg:mx-0"
+          >
+            NovaJX runs an adaptive AI engine that distributes NJX fairly across millions of devices. No rigs. No fees. One tap a day.
+          </motion.p>
+
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            custom={3}
+            className="mt-8 flex flex-col items-center gap-3 sm:flex-row lg:items-start lg:justify-start"
+          >
+            <Button asChild size="lg" className="group relative h-12 w-full gap-2 overflow-hidden bg-gradient-primary px-8 text-primary-foreground shadow-elegant animate-pulse-glow sm:w-auto">
+              <Link to="/signup" search={{ ref: "" }}>
+                <span className="relative z-10 flex items-center gap-2">Launch app <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></span>
+                <span className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-beam" />
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="h-12 w-full gap-2 border-primary/40 bg-background/40 px-8 backdrop-blur-sm sm:w-auto">
+              <a href="/downloads/NovaJX.apk" download>
+                <Download className="h-4 w-4" /> Download App
+              </a>
+            </Button>
+          </motion.div>
+
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            custom={4}
+            className="mt-8 grid max-w-md grid-cols-3 gap-4 lg:mx-0"
+          >
+            <Stat label="Miners" target={128447} suffix="+" />
+            <Stat label="Countries" target={180} suffix="+" />
+            <Stat label="Claims / day" target={2.4} suffix="M" decimals={1} />
+          </motion.div>
         </div>
-      </section>
 
-      <section className="relative z-10 mx-auto max-w-3xl px-4 pb-24 text-center sm:px-6">
-        <Trophy className="mx-auto h-10 w-10 text-gold" />
-        <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Collect. Invite. Climb the ranks.</h2>
-        <p className="mt-3 text-muted-foreground">Early collectors earn the most. Join now and lock in your rank.</p>
-        <Button asChild size="lg" className="mt-7 h-12 bg-gradient-primary px-8 text-primary-foreground shadow-elegant">
-          <Link to="/signup" search={{ ref: "" }}>Create free account</Link>
-        </Button>
-      </section>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1, ease: [0.2, 0.8, 0.2, 1] }}
+          className="relative mx-auto w-full max-w-md"
+        >
+          <HeroCoin />
+          <FloatingCard className="absolute -left-2 top-6 sm:-left-6" icon={Brain} title="AI epoch" value="#1,284" sub="adaptive" delay={0.3} />
+          <FloatingCard className="absolute -right-2 top-1/3 sm:-right-6" icon={Cpu} title="Hashrate" value="842 TH/s" sub="live" delay={0.55} />
+          <FloatingCard className="absolute bottom-4 left-1/2 -translate-x-1/2" icon={Lock} title="Secured" value="Zero-knowledge" sub="audited" delay={0.8} />
+          {!reduce && <MiningStats />}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
 
-      <footer className="relative z-10 border-t border-border/60 py-8 text-center text-xs text-muted-foreground">
-        <p className="mx-auto max-w-2xl px-4">
-          Novajx is a digital rewards platform. NJX credits are virtual and used inside the app only.
-        </p>
-        <p className="mt-2">© {new Date().getFullYear()} NovaJX</p>
-      </footer>
+function Stat({ label, target, suffix = "", decimals = 0 }: { label: string; target: number; suffix?: string; decimals?: number }) {
+  const [v, setV] = useState(0);
+  useEffect(() => {
+    const start = performance.now();
+    const dur = 1400;
+    let raf = 0;
+    const tick = (t: number) => {
+      const k = Math.min(1, (t - start) / dur);
+      const eased = 1 - Math.pow(1 - k, 3);
+      setV(target * eased);
+      if (k < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target]);
+  const formatted = decimals
+    ? v.toFixed(decimals)
+    : Math.round(v).toLocaleString();
+  return (
+    <div className="rounded-xl border border-border/60 bg-card/50 px-3 py-2.5 text-left backdrop-blur-sm">
+      <div className="font-display text-xl font-bold tabular-nums text-foreground">{formatted}{suffix}</div>
+      <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
     </div>
   );
 }
 
-function XRBackground() {
+function FloatingCard({ className = "", icon: Icon, title, value, sub, delay = 0 }: { className?: string; icon: React.ComponentType<{ className?: string }>; title: string; value: string; sub: string; delay?: number }) {
   return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-      {/* grid */}
-      <div
-        className="absolute inset-0 opacity-[0.18]"
-        style={{
-          backgroundImage:
-            "linear-gradient(oklch(0.84 0.18 88 / 0.25) 1px, transparent 1px), linear-gradient(90deg, oklch(0.84 0.18 88 / 0.25) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-          maskImage: "radial-gradient(ellipse at 50% 30%, black 30%, transparent 75%)",
-          WebkitMaskImage: "radial-gradient(ellipse at 50% 30%, black 30%, transparent 75%)",
-        }}
-      />
-      {/* orbs */}
-      <div className="absolute -top-32 left-1/2 h-[520px] w-[520px] -translate-x-1/2 animate-orb-float rounded-full bg-gradient-gold opacity-20 blur-3xl" />
-      <div className="absolute bottom-0 right-[-10%] h-[420px] w-[420px] animate-orb-float-rev rounded-full bg-primary/20 blur-3xl" />
-      <div className="absolute top-1/3 left-[-10%] h-[360px] w-[360px] animate-orb-float rounded-full bg-primary/10 blur-3xl" />
-      {/* scanlines */}
-      <div className="absolute inset-0 animate-scan opacity-[0.06] [background:repeating-linear-gradient(0deg,transparent_0,transparent_3px,oklch(0.92_0.18_92)_3px,oklch(0.92_0.18_92)_4px)]" />
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.6 }}
+      className={`holo-border glass hidden rounded-xl px-3 py-2 shadow-elegant sm:block ${className}`}
+    >
+      <div className="flex items-center gap-2">
+        <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-primary text-primary-foreground">
+          <Icon className="h-3.5 w-3.5" />
+        </span>
+        <div className="text-left">
+          <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{title}</div>
+          <div className="font-display text-sm font-bold tabular-nums">{value}</div>
+          <div className="text-[9px] text-muted-foreground">{sub}</div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+const FEATURES = [
+  { icon: Brain, title: "Adaptive AI engine", desc: "Onboard models tune claim difficulty in real time to keep distribution fair." },
+  { icon: Cpu, title: "Zero hardware", desc: "Less than 1% battery per claim. No rigs, no fans, no e-waste." },
+  { icon: Lock, title: "Zero-knowledge security", desc: "Audited signatures, on-device key custody, KYC behind ZK proofs." },
+  { icon: Globe2, title: "Global throughput", desc: "180+ countries. Offline-tolerant claims sync the moment you reconnect." },
+  { icon: Users, title: "Referral economy", desc: "Earn 1 RNT for every friend who joins with your code." },
+  { icon: Rocket, title: "Mainnet ready", desc: "Predictable emissions and on-chain–style accounting from day one." },
+];
+
+function FeatureGrid() {
+  return (
+    <section className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6">
+      <div className="mb-10 max-w-2xl">
+        <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+          <Sparkles className="h-3 w-3" /> Capabilities
+        </div>
+        <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-5xl">Enterprise-grade. Mobile-native.</h2>
+        <p className="mt-3 text-muted-foreground">A full crypto stack — distributed by AI, designed for the next billion users.</p>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {FEATURES.map((f, i) => (
+          <motion.div
+            key={f.title}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, delay: (i % 3) * 0.08 }}
+            className="holo-border hover-lift group relative rounded-2xl border border-border/60 bg-card/60 p-6 backdrop-blur-sm"
+          >
+            <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground shadow-elegant">
+              <f.icon className="h-5 w-5" />
+            </div>
+            <h3 className="font-display text-lg font-semibold">{f.title}</h3>
+            <p className="mt-1.5 text-sm text-muted-foreground">{f.desc}</p>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function HowItWorks() {
+  const steps = [
+    { icon: Download, title: "Download NovaJX", desc: "Install the app on Android in seconds. iOS coming soon." },
+    { icon: ShieldCheck, title: "Verify with one tap", desc: "Lightweight KYC keeps the network honest — no spreadsheets." },
+    { icon: Cpu, title: "Claim daily NJX", desc: "Open the app. Tap. Our AI engine credits your wallet instantly." },
+    { icon: Users, title: "Invite & earn RNT", desc: "Get 1 RNT for every verified friend. Compounds forever." },
+  ];
+  return (
+    <section className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6">
+      <div className="mb-12 text-center">
+        <h2 className="text-3xl font-bold tracking-tight sm:text-5xl">From install to first claim in 60 seconds.</h2>
+      </div>
+      <div className="relative grid gap-6 md:grid-cols-4">
+        <div className="pointer-events-none absolute inset-x-0 top-6 hidden h-px md:block">
+          <div className="mx-12 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+        </div>
+        {steps.map((s, i) => (
+          <motion.div
+            key={s.title}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.1, duration: 0.6 }}
+            className="relative rounded-2xl border border-border/60 bg-card/50 p-6 backdrop-blur-sm"
+          >
+            <div className="relative z-10 mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full border border-primary/40 bg-background text-primary shadow-elegant">
+              <s.icon className="h-5 w-5" />
+            </div>
+            <div className="absolute right-5 top-5 font-display text-3xl font-bold text-muted-foreground/20">0{i + 1}</div>
+            <h3 className="font-display text-base font-semibold">{s.title}</h3>
+            <p className="mt-1.5 text-sm text-muted-foreground">{s.desc}</p>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PartnerMarquee() {
+  const items = ["AI · COMPUTE", "ZERO-KNOWLEDGE", "MOBILE-NATIVE", "EDGE INFERENCE", "ADAPTIVE PoW", "180+ COUNTRIES", "AUDITED", "OPEN PROTOCOL"];
+  const row = [...items, ...items];
+  return (
+    <section className="relative z-10 mx-auto mb-10 max-w-7xl px-4 sm:px-6">
+      <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-card/30 py-4 backdrop-blur-md [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)]">
+        <div className="flex w-max animate-marquee gap-10 pr-10">
+          {row.map((t, i) => (
+            <span key={i} className="font-display text-xs font-semibold uppercase tracking-[0.32em] text-muted-foreground">{t}</span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FinalCTA() {
+  return (
+    <section className="relative mx-auto max-w-5xl px-4 pb-24 sm:px-6">
+      <div className="holo-border relative overflow-hidden rounded-3xl border border-primary/30 bg-card/40 px-6 py-14 text-center backdrop-blur-md sm:py-20">
+        <div className="pointer-events-none absolute inset-0 aurora-mesh opacity-50" />
+        <div className="relative">
+          <Trophy className="mx-auto h-10 w-10 text-gold drop-shadow-[0_0_12px_oklch(0.92_0.18_92/0.7)]" />
+          <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-5xl">Lock in your rank. <span className="text-shine">Early miners earn the most.</span></h2>
+          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">Join 128k+ miners distributing NJX across the world. The protocol rewards the first.</p>
+          <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Button asChild size="lg" className="h-12 bg-gradient-primary px-8 text-primary-foreground shadow-elegant animate-pulse-glow">
+              <Link to="/signup" search={{ ref: "" }}>Create free account</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="h-12 border-primary/40 px-8 backdrop-blur-sm">
+              <Link to="/ai-mining">How AI mining works</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
 function HeroCoin() {
   return (
-    <div className="relative mx-auto mt-16 flex h-[260px] w-[260px] items-center justify-center sm:mt-20 sm:h-[320px] sm:w-[320px]">
+    <div className="relative mx-auto flex h-[300px] w-[300px] items-center justify-center sm:h-[380px] sm:w-[380px]">
+      <div className="absolute inset-[-20%] rounded-full bg-gradient-gold opacity-20 blur-3xl" />
       <div className="absolute inset-0 animate-orbit-slow rounded-full border border-primary/30" />
       <div className="absolute inset-4 animate-orbit-rev rounded-full border border-primary/20" />
       <div className="absolute inset-10 animate-orbit-slow rounded-full border border-dashed border-primary/30" />
       <span className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 animate-orbit-dot rounded-full bg-primary shadow-[0_0_12px_oklch(0.92_0.18_92)]" />
       <div className="absolute inset-0 animate-coin-pulse rounded-full" />
-      <CoinIcon size={160} className="relative shadow-glow" />
+      <CoinIcon size={200} className="relative shadow-glow" />
     </div>
   );
 }
 
 function MiningStats() {
-  const [hashrate, setHashrate] = useState(842.31);
-  const [miners, setMiners] = useState(128_447);
-  const [blocks, setBlocks] = useState(91_204);
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setHashrate((h) => +(h + (Math.random() - 0.4) * 4).toFixed(2));
-      setMiners((m) => m + Math.floor(Math.random() * 5));
-      setBlocks((b) => b + (Math.random() > 0.7 ? 1 : 0));
-    }, 1500);
-    return () => clearInterval(id);
-  }, []);
-
-  const stats = [
-    { icon: Cpu, label: "AI Hashrate", value: `${hashrate.toFixed(2)} TH/s`, tint: "text-primary" },
-    { icon: Activity, label: "Active Miners", value: miners.toLocaleString(), tint: "text-gold" },
-    { icon: Zap, label: "Blocks Today", value: blocks.toLocaleString(), tint: "text-success" },
-  ];
-
-  return (
-    <div className="mx-auto mt-12 grid max-w-3xl gap-3 sm:grid-cols-3">
-      {stats.map((s) => (
-        <div
-          key={s.label}
-          className="group relative overflow-hidden rounded-2xl border border-primary/20 bg-card/50 p-4 text-left backdrop-blur-md transition-smooth hover:border-primary/50"
-        >
-          <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{s.label}</span>
-            <s.icon className={`h-4 w-4 ${s.tint}`} />
-          </div>
-          <div className="mt-2 font-display text-xl font-bold tabular-nums sm:text-2xl">{s.value}</div>
-          <div className="mt-2 flex items-center gap-1.5 text-[10px] text-muted-foreground">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
-            </span>
-            Live AI mining
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+  // (kept for backwards reference; superseded by Hero floating cards)
+  return null;
 }
 
 type Price = { id: string; symbol: string; name: string; price: number; change: number };
@@ -249,9 +358,9 @@ function LivePrices() {
   const row = [...prices, ...prices];
 
   return (
-    <section className="relative z-10 mx-auto mb-20 max-w-6xl px-4 sm:px-6">
+    <section className="relative z-10 mx-auto mb-12 max-w-7xl px-4 sm:px-6">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="font-display text-xl font-bold sm:text-2xl">Live crypto prices</h2>
+        <h2 className="font-display text-xl font-bold sm:text-2xl">Live market</h2>
         <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <span className="relative flex h-1.5 w-1.5">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />

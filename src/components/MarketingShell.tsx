@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Download, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/novajx-mark.png";
 
@@ -17,13 +17,16 @@ const NAV = [
 
 export function XRBackground() {
   return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden grain">
+      {/* Aurora gradient mesh */}
+      <div className="absolute inset-0 aurora-mesh opacity-80" />
+      {/* Grid */}
       <div
-        className="absolute inset-0 opacity-[0.18]"
+        className="absolute inset-0 opacity-[0.15]"
         style={{
           backgroundImage:
-            "linear-gradient(oklch(0.84 0.18 88 / 0.25) 1px, transparent 1px), linear-gradient(90deg, oklch(0.84 0.18 88 / 0.25) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
+            "linear-gradient(oklch(0.84 0.18 88 / 0.22) 1px, transparent 1px), linear-gradient(90deg, oklch(0.84 0.18 88 / 0.22) 1px, transparent 1px)",
+          backgroundSize: "56px 56px",
           maskImage: "radial-gradient(ellipse at 50% 30%, black 30%, transparent 75%)",
           WebkitMaskImage: "radial-gradient(ellipse at 50% 30%, black 30%, transparent 75%)",
         }}
@@ -36,11 +39,41 @@ export function XRBackground() {
   );
 }
 
+function ScrollProgress() {
+  const [p, setP] = useState(0);
+  useEffect(() => {
+    const on = () => {
+      const h = document.documentElement;
+      const max = (h.scrollHeight - h.clientHeight) || 1;
+      setP(h.scrollTop / max);
+    };
+    on();
+    window.addEventListener("scroll", on, { passive: true });
+    window.addEventListener("resize", on);
+    return () => { window.removeEventListener("scroll", on); window.removeEventListener("resize", on); };
+  }, []);
+  return (
+    <div className="fixed inset-x-0 top-0 z-50 h-0.5 bg-transparent">
+      <div
+        className="h-full bg-gradient-to-r from-primary via-gold to-primary shadow-[0_0_12px_oklch(0.92_0.18_92/0.7)]"
+        style={{ width: `${p * 100}%`, transition: "width 80ms linear" }}
+      />
+    </div>
+  );
+}
+
 export function MarketingHeader() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const on = () => setScrolled(window.scrollY > 8);
+    on();
+    window.addEventListener("scroll", on, { passive: true });
+    return () => window.removeEventListener("scroll", on);
+  }, []);
   return (
-    <header className="relative z-20 mx-auto max-w-7xl px-4 py-5 sm:px-6">
-      <div className="flex items-center justify-between gap-4">
+    <header className={`sticky top-0 z-40 transition-all ${scrolled ? "bg-background/60 backdrop-blur-xl border-b border-border/60" : "bg-transparent"}`}>
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2.5">
           <span className="relative inline-flex h-9 w-9 items-center justify-center">
             <span className="absolute inset-0 animate-logo-spin rounded-full border border-primary/40" />
@@ -72,7 +105,7 @@ export function MarketingHeader() {
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
             <Link to="/signin" search={{ redirect: "/dashboard" }}>Sign in</Link>
           </Button>
-          <Button asChild size="sm" className="bg-gradient-primary text-primary-foreground shadow-elegant">
+          <Button asChild size="sm" className="relative overflow-hidden bg-gradient-primary text-primary-foreground shadow-elegant">
             <Link to="/signup" search={{ ref: "" }}>Get started</Link>
           </Button>
           <button
@@ -86,7 +119,7 @@ export function MarketingHeader() {
       </div>
 
       {open && (
-        <nav className="mt-4 grid gap-1 rounded-2xl border border-border/60 bg-card/80 p-3 backdrop-blur-md lg:hidden">
+        <nav className="mx-4 mb-4 grid gap-1 rounded-2xl border border-border/60 bg-card/80 p-3 backdrop-blur-md lg:hidden">
           {NAV.map((n) => (
             <Link
               key={n.to}
@@ -150,6 +183,7 @@ function FooterCol({ title, links }: { title: string; links: [string, string][] 
 export function MarketingShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-gradient-hero">
+      <ScrollProgress />
       <XRBackground />
       <MarketingHeader />
       <main className="relative z-10">{children}</main>
