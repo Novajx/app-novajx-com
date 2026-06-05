@@ -126,7 +126,9 @@ function UsersTab() {
       if (q.trim()) query = query.or(`email.ilike.%${q}%,full_name.ilike.%${q}%,referral_code.ilike.%${q}%`);
       const { data: profiles, error } = await query;
       if (error) throw error;
-      const ids = (profiles ?? []).map((p) => p.id);
+      type ProfileRow = { id: string; full_name: string; email: string | null; country: string | null; banned: boolean; created_at: string; referral_code: string };
+      const rows = ((profiles ?? []) as unknown as ProfileRow[]);
+      const ids = rows.map((p) => p.id);
       const { data: wallets } = ids.length
         ? await supabase.from("wallets").select("user_id, balance, total_mined").in("user_id", ids)
         : { data: [] as { user_id: string; balance: number; total_mined: number }[] };
@@ -140,7 +142,7 @@ function UsersTab() {
         arr.push(r.role);
         rmap.set(r.user_id, arr);
       });
-      return (profiles ?? []).map((p) => ({ ...p, wallet: wmap.get(p.id), roles: rmap.get(p.id) ?? [] }));
+      return rows.map((p) => ({ ...p, wallet: wmap.get(p.id), roles: rmap.get(p.id) ?? [] }));
     },
   });
 
