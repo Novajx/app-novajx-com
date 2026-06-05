@@ -193,8 +193,16 @@ function WalletPage() {
   const locked = Number((wallet as any)?.locked_balance ?? 0);
   const rnt = Number((wallet as any)?.rnt_balance ?? 0);
 
-  // Swap eligibility: KYC-approved users can swap any positive amount immediately
-  const canSwap = kycApproved && locked > 0;
+  // 20-day waiting period after KYC approval before swap/withdraw is unlocked
+  const approvedAt = profile?.kyc_approved_at ? new Date(profile.kyc_approved_at) : null;
+  const unlockDate = approvedAt ? new Date(approvedAt.getTime() + 20 * 86400000) : null;
+  const waitingPeriodOver = !!unlockDate && unlockDate.getTime() <= Date.now();
+  const daysRemaining = unlockDate
+    ? Math.max(0, Math.ceil((unlockDate.getTime() - Date.now()) / 86400000))
+    : null;
+
+  // Swap eligibility: KYC approved AND 20-day waiting period elapsed
+  const canSwap = kycApproved && waitingPeriodOver && locked > 0;
 
   // Transfer eligibility — anyone with available balance can send
   const hasAvailable = balance > 0;
@@ -446,6 +454,20 @@ function WalletPage() {
                   <Link to={"/kyc" as any} className="mt-2 inline-block text-xs font-semibold text-primary underline">
                     Verify now →
                   </Link>
+                </div>
+              </div>
+            )}
+
+            {kycApproved && !waitingPeriodOver && unlockDate && (
+              <div className="mt-4 flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
+                <Lock className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
+                <div className="flex-1">
+                  <p className="font-semibold">Withdrawal locked: 20 days waiting period after KYC approval.</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Unlocks on <strong>{unlockDate.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}</strong>
+                    {" · "}
+                    <strong>{daysRemaining}</strong> day{daysRemaining === 1 ? "" : "s"} remaining
+                  </p>
                 </div>
               </div>
             )}
