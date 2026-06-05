@@ -119,7 +119,7 @@ function UsersTab() {
     queryKey: ["admin-users", q],
     queryFn: async () => {
       let query = supabase
-        .from("profiles")
+        .from("profiles_safe" as any)
         .select("id, full_name, email, country, banned, created_at, referral_code")
         .order("created_at", { ascending: false })
         .limit(100);
