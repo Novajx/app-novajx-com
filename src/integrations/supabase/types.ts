@@ -204,6 +204,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
         ]
       }
       rate_limits: {
@@ -445,6 +452,64 @@ export type Database = {
           user_id: string | null
         }
         Relationships: []
+      }
+      profiles_safe: {
+        Row: {
+          banned: boolean | null
+          country: string | null
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string | null
+          kyc_approved_at: string | null
+          referral_code: string | null
+          referred_by: string | null
+        }
+        Insert: {
+          banned?: boolean | null
+          country?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string | null
+          kyc_approved_at?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
+        }
+        Update: {
+          banned?: boolean | null
+          country?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string | null
+          kyc_approved_at?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
